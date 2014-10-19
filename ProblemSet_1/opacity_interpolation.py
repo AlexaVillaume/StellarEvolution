@@ -1,5 +1,4 @@
 '''
-
 Develop a program, by interpolation in a table, for caculating the opacity of a
 gas with a given density and temperature, and with the chemical compoistion that you
 will use for the stellar model.
@@ -10,13 +9,11 @@ What do you obtain for the opacity in (cm^2 g^-1) for:
 
 The temperature range you will need for the stellar models runs from 5x10^3 to 3x10^7 K,
 and the dnesity range from 10^-9 to 10^3 g cm^-3, depending on T.
-
 '''
+
 import sys
 import numpy as np
-from scipy.interpolate import griddata
 from scipy import interpolate
-
 
 # Read in the table and sort the values into the appropriate arrays
 logT = []
@@ -40,26 +37,15 @@ with open('test_table.dat', 'r') as f:
                 opacity.append(tmp_opacity)
 
 logT = np.asarray(logT)
-
 blargh = np.empty((70,19))
 for i, blah in enumerate(opacity):
-#    print i, len(blargh[i]), len(blah)
     blargh[i] = blah
 
-print blargh
 
-#opacity = np.asarray(opacity)
-print logR.size
-print blargh.shape
-#sys.exit()
-# Correct the "R" values to be density values
-# R=density[g/cm**3]/T6**3, T6=1.e-6*T[degrees]
-
-# Need to get the opacity values into an array-like structure
-#function = interpolate.interp2d(logT, logR, opacity)
+# Nee
 function = interpolate.RectBivariateSpline(logT, logR, blargh)
-
 print function
 
 # Input
-# Correct the input density values to "R" used in the table
+# Correct the "R" values to be density values
+# R=density[g/cm**3]/T6**3, T6=1.e-6*T[degrees]
