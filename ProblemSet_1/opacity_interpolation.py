@@ -19,7 +19,6 @@ from scipy import interpolate
 
 
 # Read in the table and sort the values into the appropriate arrays
-# Make these all into numpy arrays. Fix handling of missing values.
 logT = []
 opacity = []
 with open('test_table.dat', 'r') as f:
@@ -30,24 +29,36 @@ with open('test_table.dat', 'r') as f:
         else:
             logT.append(float(cols[0]))
             if len(logR) == len(cols):
+            #    opacity[i] = [float(value) for value in cols[1:len(cols)]]
+            #    opacity = np.append(opacity, [float(value) for value in cols[1:len(cols)]])
                 opacity.append([float(value) for value in cols[1:len(cols)]])
             else:
-                tmp_opacity = []
+                tmp_opacity = [float(value) for value in cols[1:len(cols)]]
                 while True:
                     if len(tmp_opacity) == len(logR):
                         break
                     else:
-
+                        tmp_opacity.append(9.999)
+           #     opacity = np.append(opacity, tmp_opacity)
+                opacity.append(tmp_opacity)
 
 logT = np.asarray(logT)
-opacity = np.asarray(opacity)
 #print opacity
+#print np.shape(opacity)
+#sys.exit()
 
+blargh = np.empty((70,19))
+print blargh.shape
+for i, blah in enumerate(opacity):
+    print blah
+    blargh[i] = blah
+
+#opacity = np.asarray(opacity)
+print logR.size
+print opacity.shape
 # Correct the "R" values to be density values
 # R=density[g/cm**3]/T6**3, T6=1.e-6*T[degrees]
 
-#print len(logT), len(logR)
-#sys.exit()
 # Need to get the opacity values into an array-like structure
 #function = interpolate.interp2d(logT, logR, opacity)
 function = interpolate.RectBivariateSpline(logT, logR, opacity)
