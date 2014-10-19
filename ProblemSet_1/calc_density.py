@@ -30,6 +30,9 @@ b_P = 16.87
 def mu_is(X, Y):
     return 2/(1 + 3*X + 0.5*Y)
 
+def gas_pressure_is(rho, logT, X, Y):
+    return ((r*(1 + 3.*X + 0.5*Y))/2.)*rho*10**logT
+
 def density_is(logT, logP, X, Y):
     mu = mu_is(X, Y)
     top = 10**logP - ((1/3)*a*(10**logT)**4)
@@ -37,5 +40,11 @@ def density_is(logT, logP, X, Y):
     return mu*(top/bottom)
 
 
-print "For part a: ", density_is(a_T, a_P, a_X, a_Y)
-print "For part b: ", density_is(b_T, b_P, b_X, b_Y)
+print "For part a: "
+rho = density_is(a_T, a_P, a_X, a_Y)
+print "The density is: ", rho
+print "Beta is: ", gas_pressure_is(rho, a_T, a_X, a_Y)/10**a_P
+print "For part b: ",
+rho = density_is(b_T, b_P, b_X, b_Y)
+print "The density is: ", rho
+print "Beta is: ", gas_pressure_is(rho, b_T, b_X, b_Y)/10**b_P
