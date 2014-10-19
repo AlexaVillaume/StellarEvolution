@@ -28,10 +28,11 @@ b_T = 6.91
 b_P = 16.87
 
 def mu_is(X, Y):
-    return 2/(1 + 3*X + 0.5*Y)
+    return 2./(1. + 3.*X + 0.5*Y)
 
 def gas_pressure_is(rho, logT, X, Y):
-    return ((r*(1 + 3.*X + 0.5*Y))/2.)*rho*10**logT
+    mu = mu_is(X, Y)
+    return r*rho*(10**logT) / mu
 
 def density_is(logT, logP, X, Y):
     mu = mu_is(X, Y)
