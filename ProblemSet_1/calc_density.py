@@ -34,9 +34,12 @@ def gas_pressure_is(rho, logT, X, Y):
     mu = mu_is(X, Y)
     return r*rho*(10**logT) / mu
 
+def rad_pressure_is(logT):
+    return 0.33*a*(10*logT)**4
+
 def density_is(logT, logP, X, Y):
     mu = mu_is(X, Y)
-    top = 10**logP - ((1/3)*a*(10**logT)**4)
+    top = 10**logP - ((0.33)*a*(10**logT)**4)
     bottom = r*(10**logT)
     return mu*(top/bottom)
 
