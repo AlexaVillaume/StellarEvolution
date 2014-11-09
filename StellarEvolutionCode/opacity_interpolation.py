@@ -1,4 +1,9 @@
 '''
+PURPOSE:
+    Interpolate over OPAL opacity tables to find opacity given a
+    temperature and a density.
+CALLING SEQUENCE:
+    get_opacity(temperature, density)
 '''
 
 import sys
@@ -39,4 +44,7 @@ for i, blah in enumerate(opacities):
     blargh[i] = blah
 
 function = interpolate.RectBivariateSpline(logTs, logRs, blargh)
+
+def get_opacity(temperature, density)
+    return function(temperature, density_r(temperature, density))
 
