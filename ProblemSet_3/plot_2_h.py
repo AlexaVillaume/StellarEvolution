@@ -29,8 +29,9 @@ density = 4.35*(np.sin(blargh*np.pi)/(blargh*np.pi))
 pressure = 2.082e12*(density)**2
 temperature = calc_t(pressure, density)
 
-plt.plot(j_pressure, j_temp)
-plt.plot(pressure, ((pressure*mu*m_h)/(density*k)), lw=5)
+plt.plot(j_pressure, j_temp, ls='none', marker='o',  label='Real Jupiter Model')
+plt.plot(pressure, ((pressure*mu*m_h)/(density*k)), lw=3,label='My solution')
+plt.legend()
 plt.xlabel('Pressure')
 plt.ylabel('Temperature')
 plt.xscale('log')
