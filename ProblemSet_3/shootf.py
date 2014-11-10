@@ -58,12 +58,10 @@ def load1(mass):
     We'll start at some tiny value of m, with an
     assumed pressure_c and temperature_c.
     """
+    # I actually think I just want to call derivs to get these values
 
     density_c = calc_density.density_is(math.log10(temperature_c), math.log10(pressure_c), X, Y)
     e_n = calc_e_n(density_c, temperature_c)
-
-    # Calculate initial, tiny radius
-    radius_initial = 3./(4*math.pi*density_c)**(1./3.)*mass**(1./3.)
 
     term1 = -(3.*G)/(8.*math.pi)
     term2 = (density_c*4.*math.pi/3.)**(4./3.)
@@ -112,25 +110,30 @@ def load2():
     #        break
     #radius =
 
-    #return [pressure, temperature, radius, luminosity]
+    return [pressure, t_eff, total_radius, total_lu,]
 
 def derivs(pressure, temperature, radius, luminosity):
+    # mass should be mass enclosed which depends on whether I'm integrating outward or inward
+    # need to add keyword to the calling sequence that says which direction the integration is
+    # going
+
     density = calc_density.density_is(math.log10(temperature), math.log10(pressure), X, Y)
     opacity = 10**opacity_interpolation.opacity_is(math.log10(temperature), math.log10(density))
 
-    d_pressure = -((G)/(4*math.pi))*((total_mass)/(radius**4))
-    d_radius = (1./(4.*math.pi))*(1./(density*radius**2))
-    d_luminoisty = calc_e_n(density, temperature)
+    # Should total_mass be used here?
+    dpressure_dm = -((G)/(4*math.pi))*((total_mass)/(radius**4))
+    dradius_dm = (1./(4.*math.pi))*(1./(density*radius**2))
+    dluminoisty_dm = calc_e_n(density, temperature)
 
     # What mass is this supposed to be?
     del_rad = calc_del_rad(density, pressure, temperature, opacity, luminosity, total_mass)
     if del_ad < del_rad:
-        d_temperature = -((G*total_mass*temperature)/(4*math.pi*pressure))*del_ad
+        dtemperature_dm = -((G*total_mass*temperature)/(4*math.pi*pressure))*del_ad
     else:
-        d_temperature = -((G*total_mass*temperature)/(4*math.pi*pressure))*del_rad
+        dtemperature_dm = -((G*total_mass*temperature)/(4*math.pi*pressure))*del_rad
 
-    return [d_pressure, d_temperature, d_radius, d_luminoisty]
+    return [dpressure_dm, dtemperature_dm, dradius_dm, dluminoisty_dm]
 
 test =  load1(mass_initial)
-#print load2()
+print load2()
 print derivs(test[0], test[1], test[2], test[3])
