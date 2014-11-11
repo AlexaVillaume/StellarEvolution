@@ -9,4 +9,6 @@ This repository is two-fold: first, it holds my answers to the problems sets thr
 to make a **1D Stellar Evolution code** which I'm writing in Python.
 
 #### Things to know
-The homework solutions are in the subdirectories labeled ''ProblemSet_1'', ''ProblemeSet_2", etc...
+The homework solutions are in the subdirectories labeled "ProblemSet_1", "ProblemeSet_2", etc...
+
+The stellar evolution code is in the subdirectory "StellarEvolutionCode".
