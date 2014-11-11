@@ -2,7 +2,10 @@
 '''
 import sys
 import math
-
+import numpy as np
+from scipy.optimize import fsolve
+from scipy.interpolate import interp1d
+import matplotlib.pyplot as plt
 import opacity_interpolation
 import calc_density
 
@@ -44,6 +47,15 @@ def calc_del_rad(density, pressure, temperature, opacity, luminosity, mass):
     term2 = (opacity*luminosity*pressure)/(mass*temperature**4)
     return term1*term2
 
+def pressure_from_ideal(density, t_eff, mu):
+    return (density*k*t_eff)/(mu*mass_h)
+
+def calc_other_pressure(opacity):
+    return (2*G*total_mass)/(3*opacity*total_radius**2)
+
+def find_intersection(function1, function2, xvalues):
+    return fsolve(lambda x: function1(x) - function2(x), xvalues)
+
 # Dummy function for now
 def calc_e_n(density, temperature):
     return 1
@@ -58,8 +70,6 @@ def load1(mass):
     We'll start at some tiny value of m, with an
     assumed pressure_c and temperature_c.
     """
-    # I actually think I just want to call derivs to get these values
-
     density_c = calc_density.density_is(math.log10(temperature_c), math.log10(pressure_c), X, Y)
     e_n = calc_e_n(density_c, temperature_c)
 
@@ -72,7 +82,7 @@ def load1(mass):
     opacity_c = 10**(opacity_interpolation.opacity_is(math.log10(temperature_c), math.log10(density_c)))
     del_rad = calc_del_rad(density_c, pressure_c, temperature_c, opacity_c, luminosity_c, mass)
     if del_rad >= del_ad:
-        # if temperature gradiant is greater than del_ad, then convective
+        # if temperature gradiant is greater than del_ad, then convective (because blobs are unstable)
         term1 = -(math.pi/6.)**(1./3.)
         term2 =  (del_ad_c*density_c**(4./3.))/pressure_c
         temperature = math.exp(term1*G*term2*mass**(2./3.) - math.log(temperature_c))
@@ -98,11 +108,37 @@ return radius and l.
 def load2():
     t_eff = calc_teff(total_radius, total_lum)
     mu = calc_density.mu_is(X, Y)
-    opacity_s = 10**opacity_interpolation.opacity_is(math.log10(t_eff), math.log10(density_surface))
 
-    # These are more different than I would expect
-    pressure1 = (density_surface*k*t_eff)/(mu*mass_h)
-    pressure2 = (2*G*total_mass)/(3*opacity_s*total_radius**2)
+    # Make an array of density values
+    densities = np.linspace(1e-9,density_surface,1e4)
+    # Calculate corresponding pressure arrays
+    pressures1 = np.asarray([pressure_from_ideal(density, t_eff, mu) for density in densities])
+    # Calculate an array of opacity values for computing pressure2
+    opacities = [10**opacity_interpolation.opacity_is(math.log10(t_eff), math.log10(density)) for density in densities]
+    pressures2 = np.asarray([calc_other_pressure(opacity) for opacity in opacities])
+
+    # Make functions out of the pressures so that I can find the intersecting point
+    #rint np.intersect1d(pressures1, pressures2, assume_unique=False)
+    #p1 = interp1d(densities, pressures1)
+    #p2 = interp1d(densities, pressures2)
+    #print find_intersection(p1, p2,10)
+    intersection_index = np.abs(pressures1 - pressures2).argmin(0)
+    print pressures1[intersection_index], pressures2[intersection_index], densities[intersection_index]
+
+    plt.plot(densities, pressures2, lw=4)
+    plt.plot(densities, pressures1)
+    plt.xlabel('Density')
+    plt.ylabel('Pressure')
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.show()
+    sys.exit()
+
+
+    #opacity_s = 10**opacity_interpolation.opacity_is(math.log10(t_eff), math.log10(density_surface))
+    ## These are more different than I would expect
+    #pressure1 = (density_surface*k*t_eff)/(mu*mass_h)
+    #pressure2 = (2*G*total_mass)/(3*opacity_s*total_radius**2)
 
     #while percent_difference(pressure1, pressure2) > 0.01:
 
@@ -110,7 +146,7 @@ def load2():
     #        break
     #radius =
 
-    return [pressure, t_eff, total_radius, total_lu,]
+    #return [pressure, t_eff, total_radius, total_lum]
 
 def derivs(pressure, temperature, radius, luminosity):
     # mass should be mass enclosed which depends on whether I'm integrating outward or inward
@@ -120,20 +156,19 @@ def derivs(pressure, temperature, radius, luminosity):
     density = calc_density.density_is(math.log10(temperature), math.log10(pressure), X, Y)
     opacity = 10**opacity_interpolation.opacity_is(math.log10(temperature), math.log10(density))
 
-    # Should total_mass be used here?
     dpressure_dm = -((G)/(4*math.pi))*((total_mass)/(radius**4))
     dradius_dm = (1./(4.*math.pi))*(1./(density*radius**2))
     dluminoisty_dm = calc_e_n(density, temperature)
 
-    # What mass is this supposed to be?
     del_rad = calc_del_rad(density, pressure, temperature, opacity, luminosity, total_mass)
-    if del_ad < del_rad:
+    if del_rad >= del_ad:
         dtemperature_dm = -((G*total_mass*temperature)/(4*math.pi*pressure))*del_ad
     else:
         dtemperature_dm = -((G*total_mass*temperature)/(4*math.pi*pressure))*del_rad
 
     return [dpressure_dm, dtemperature_dm, dradius_dm, dluminoisty_dm]
 
-test =  load1(mass_initial)
+#test =  load1(mass_initial)
+#print test
 print load2()
-print derivs(test[0], test[1], test[2], test[3])
+#print derivs(test[0], test[1], test[2], test[3])
