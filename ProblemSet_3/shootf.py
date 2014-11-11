@@ -135,10 +135,10 @@ def load2(test=True):
     return [surface_pressure, t_eff, total_radius, total_lum]
 
 def derivs(pressure, temperature, radius, luminosity, mass):
-    # mass should be mass enclosed which depends on whether I'm integrating outward or inward
-    # need to add keyword to the calling sequence that says which direction the integration is
-    # going
-
+    """
+    The mass given should be the enclosed mass, deal with that
+    outside the function.
+    """
     density = calc_density.density_is(math.log10(temperature), math.log10(pressure), X, Y)
     opacity = 10**opacity_interpolation.opacity_is(math.log10(temperature), math.log10(density))
 
