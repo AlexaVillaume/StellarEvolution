@@ -105,50 +105,36 @@ guess outer radius and ltot
 
 return radius and l.
 """
-def load2():
+def load2(test=True):
     t_eff = calc_teff(total_radius, total_lum)
     mu = calc_density.mu_is(X, Y)
 
     # Make an array of density values
-    densities = np.linspace(1e-9,density_surface,1e4)
+    densities = np.linspace(1e-9,density_surface,1e5)
     # Calculate corresponding pressure arrays
     pressures1 = np.asarray([pressure_from_ideal(density, t_eff, mu) for density in densities])
     # Calculate an array of opacity values for computing pressure2
     opacities = [10**opacity_interpolation.opacity_is(math.log10(t_eff), math.log10(density)) for density in densities]
     pressures2 = np.asarray([calc_other_pressure(opacity) for opacity in opacities])
 
-    # Make functions out of the pressures so that I can find the intersecting point
-    #rint np.intersect1d(pressures1, pressures2, assume_unique=False)
-    #p1 = interp1d(densities, pressures1)
-    #p2 = interp1d(densities, pressures2)
-    #print find_intersection(p1, p2,10)
     intersection_index = np.abs(pressures1 - pressures2).argmin(0)
-    print pressures1[intersection_index], pressures2[intersection_index], densities[intersection_index]
+    # Need to address what to do if more then one index is returned
+    surface_pressure = (pressures1[intersection_index] + pressures2[intersection_index]) / 2
+    surface_density = densities[intersection_index]
 
-    plt.plot(densities, pressures2, lw=4)
-    plt.plot(densities, pressures1)
-    plt.xlabel('Density')
-    plt.ylabel('Pressure')
-    plt.xscale('log')
-    plt.yscale('log')
-    plt.show()
-    sys.exit()
+    if test:
+        plt.plot(densities, pressures2, lw=2)
+        plt.plot(densities, pressures1, lw=2)
+        plt.plot(surface_density, surface_pressure, ls='none', marker='o')
+        plt.xlabel('Density')
+        plt.ylabel('Pressure')
+        plt.xscale('log')
+        plt.yscale('log')
+        plt.show()
 
+    return [surface_pressure, t_eff, total_radius, total_lum]
 
-    #opacity_s = 10**opacity_interpolation.opacity_is(math.log10(t_eff), math.log10(density_surface))
-    ## These are more different than I would expect
-    #pressure1 = (density_surface*k*t_eff)/(mu*mass_h)
-    #pressure2 = (2*G*total_mass)/(3*opacity_s*total_radius**2)
-
-    #while percent_difference(pressure1, pressure2) > 0.01:
-
-    #    else:
-    #        break
-    #radius =
-
-    #return [pressure, t_eff, total_radius, total_lum]
-
-def derivs(pressure, temperature, radius, luminosity):
+def derivs(pressure, temperature, radius, luminosity, mass):
     # mass should be mass enclosed which depends on whether I'm integrating outward or inward
     # need to add keyword to the calling sequence that says which direction the integration is
     # going
@@ -156,19 +142,19 @@ def derivs(pressure, temperature, radius, luminosity):
     density = calc_density.density_is(math.log10(temperature), math.log10(pressure), X, Y)
     opacity = 10**opacity_interpolation.opacity_is(math.log10(temperature), math.log10(density))
 
-    dpressure_dm = -((G)/(4*math.pi))*((total_mass)/(radius**4))
+    dpressure_dm = -((G)/(4*math.pi))*((mass)/(radius**4))
     dradius_dm = (1./(4.*math.pi))*(1./(density*radius**2))
     dluminoisty_dm = calc_e_n(density, temperature)
 
-    del_rad = calc_del_rad(density, pressure, temperature, opacity, luminosity, total_mass)
+    del_rad = calc_del_rad(density, pressure, temperature, opacity, luminosity, mass)
     if del_rad >= del_ad:
-        dtemperature_dm = -((G*total_mass*temperature)/(4*math.pi*pressure))*del_ad
+        dtemperature_dm = -((G*mass*temperature)/(4*math.pi*pressure))*del_ad
     else:
-        dtemperature_dm = -((G*total_mass*temperature)/(4*math.pi*pressure))*del_rad
+        dtemperature_dm = -((G*mass*temperature)/(4*math.pi*pressure))*del_rad
 
     return [dpressure_dm, dtemperature_dm, dradius_dm, dluminoisty_dm]
 
-#test =  load1(mass_initial)
-#print test
-print load2()
-#print derivs(test[0], test[1], test[2], test[3])
+core =  load1(mass_initial)
+surface =  load2()
+print derivs(core[0], core[1], core[2], core[3], mass_initial)
+print derivs(surface[0], surface[1], surface[2], surface[3], total_mass)
