@@ -1,0 +1,400 @@
+\documentclass[12pt]{article}
+ \usepackage{amsmath}
+ \usepackage{mathtools}
+ \usepackage{accents}
+\usepackage{hyperref}
+
+
+ \newcommand*{\dt}[1]{%
+  \accentset{\mbox{\large\bfseries .}}{#1}}
+  
+ \begin{document}
+ 
+ \title{Problem Set 2}
+\author{Alexa Villaume\\ 
+Stellar Evolution } 
+ 
+\maketitle
+ 
+\noindent \textbf{Problem 1} Given a spherical equilibrium configuration of mass $M$ and radius $R$, assume that the density distribution is given by $\rho \left(r \right) = \rho_c\left ( 1- r/R\right )$.\\
+\noindent \textbf{(a)} Calculate the mass distribution $m \left( r \right)$ \\
+
+\noindent Let's start with, 
+
+\begin{equation}
+dm = 4\pi r^2 \rho dr.
+\end{equation}
+
+\noindent Plugging in what we know about $\rho$ to get,
+
+\begin{equation}
+dm = 4\pi r^2 \rho_c \left(1- r/R  \right)dr.
+\end{equation}
+
+\noindent Which to get the integral we expand out,
+
+\begin{equation}
+\int_M dm = \int_R 4\pi r^2 \rho_c  dr - \int_R \frac{4\pi r^3 \rho_c}{R}  dr,
+\end{equation}
+
+\noindent to get,
+
+\begin{equation}
+m\left ( r \right) = 4\pi \rho_c \frac{r^3}{3} - \pi \rho_c \frac{r^4}{R}.
+\end{equation}
+
+\noindent To get the function in terms of $R$ and $M$ we can evaluate the above at $R$ and solve for $\rho_c$,
+
+\begin{equation}
+\rho_c = \frac{3M}{\pi R^3}
+\end{equation}
+
+\noindent and put that into the above,
+
+\begin{equation}
+m\left ( r \right) = 4\pi \frac{3M}{\pi R^3}  \frac{r^3}{3} - \pi \frac{3M}{\pi R^3} \frac{r^4}{R}.
+\end{equation}
+
+\noindent \textbf{(b)} Calculate the total gravitational potential energy\\
+
+\noindent Start with the integral form of gravitational potential energy,
+
+\begin{equation}
+E_g = - \int_0^M \frac{Gm}{r}dm.
+\end{equation} 
+
+\noindent Which we can plug in what we know about m(r) from part a and $\rho$ to get, 
+
+\begin{equation}
+E_g = - \int_0^R G4\pi^2\rho_c^2 \left [ \frac{4r^4}{3} - \frac{4r^5}{3R} - \frac{r^5}{R} + \frac{r^6}{R^2} \right].
+\end{equation} 
+
+\noindent And take the integral,
+
+\begin{equation}
+E_g = -  G4\pi^2\rho_c^2 \left [ \frac{4r^5}{15} - \frac{4r^6}{18R} - \frac{r^6}{6R} + \frac{r^7}{7R^2} \right].
+\end{equation} 
+
+\noindent Evaluated at $R$,
+
+\begin{equation}
+E_g = -  G4\pi^2\rho_c^2 \left [ \frac{4R^5}{15} - \frac{2R^5}{9} - \frac{R^5}{6} + \frac{R^5}{7} \right].
+\end{equation} 
+
+\noindent To finally get,
+
+\begin{equation}
+E_g = - \frac{13R^5}{315}G\pi^2 \left ( \frac{3M}{\pi R^3} \right)^2.
+\end{equation} 
+
+
+\noindent \textbf{(c)} Calculate the pressure density $P\left ( r \right)$. Assume  $P\left ( r \right) = 0$. \\
+
+\noindent Let's start with hydrostatic equilibrium,
+
+\begin{equation}
+dp = -\frac{Gm\rho}{r^2} dr,
+\end{equation}
+
+\noindent and substitute in what we know about $m$ from part a and $\rho$,
+
+\begin{equation}
+dp = -\frac{G\rho_c}{r^2} \left(1 - r/R \right)\left( \frac{4\pi\rho_cr^3}{3} - \frac{\pi\rho_cr^4}{R} \right) dr.
+\end{equation}
+
+\noindent Expand it all and then simplify, 
+
+\begin{equation}
+dp = -G\rho_c^2\pi \left[\frac{4r}{3}  - \frac{r^2}{R} - \frac{4r^2}{3R} + \frac{r^3}{R^2}\right].
+\end{equation}
+
+\noindent Then take the integral to get,
+
+\begin{equation}
+P\left( r \right) = -G\rho_c^2\pi \left[\frac{2r^2}{3}  - \frac{r^3}{3R} - \frac{4r^3}{9R} + \frac{r^4}{4R^2}\right] + c.
+\end{equation}
+
+\noindent Which simplifies to,
+
+\begin{equation}
+P\left( r \right)  = -G\rho_c^2\pi \left[\frac{2r^2}{3}  - \frac{7r^3}{9R} + \frac{r^4}{4R^2}\right] + c.
+\end{equation}
+
+\noindent We can determine the value of $c$ by evaluating the function at $P\left( R\right)$ to get,
+
+\begin{equation}
+c = \frac{5}{36}\pi G \rho_c^2R^2
+\end{equation}
+
+\noindent So for the pressure density we end up with the function, 
+
+\begin{equation}
+P\left( r \right)  = -G\left( \frac{3M}{\pi R^3}\right)^2\pi \left[\frac{2r^2}{3}  - \frac{7r^3}{9R} + \frac{r^4}{4R^2}\right] + \frac{5}{36}\pi G \left(\frac{3M}{\pi R^3} \right)^2R^2.
+\end{equation}
+
+\noindent \textbf{(d)} Assume an ideal gas equation of state. Calculate the total internal energy and show that the virial theorem is satisfied.\\
+
+\noindent Let's start with the equation of internal energy for a star composed of perfect gas,
+
+\begin{equation}
+E_i = \int_0^M \frac{3}{2}\frac{P}{\rho} dm.
+\end{equation}
+
+\noindent Once again, we can substitute in what we know about $dm$ to get,
+
+\begin{equation}
+E_i = \int_0^M \frac{3}{2}P4\pi r^2dr.
+\end{equation}
+
+\noindent So now we can put in what learned about the pressure density in 1c,
+
+\begin{equation}
+E_i = \int_0^R 6\pi r^2 \left[ -G\rho_c^2\pi \left( \frac{2r^2}{3} - \frac{7r^3}{9R}  + \frac{r^4}{4R^2}\right) + \frac{5}{36}\pi G \rho_c^2R^2\right]dr. 
+\end{equation}
+
+
+\begin{equation}
+E_i = \int_0^R \left[ -\pi^2G\rho_c^2 \left( 4r^4 - \frac{14r^5}{3R}  + \frac{3r^6}{2R^2}\right) + \frac{5}{6}\pi^2 r^2 G \rho_c^2R^2\right]dr. 
+\end{equation}
+
+\begin{equation}
+E_i = \pi^2G\rho_c^2 \int_0^R   \left[ - 4r^4 + \frac{14r^5}{3R}  - \frac{3r^6}{2R^2}+ \frac{5}{6}r^2 R^2\right]dr. 
+\end{equation}
+
+
+\begin{equation}
+E_i = \pi^2G\rho_c^2   \left[ \int_0^R - 4r^4 dr +  \int_0^R \frac{14r^5}{3R}dr  -  \int_0^R\frac{3r^6}{2R^2}dr +  \int_0^R \frac{5}{6}r^2 R^2dr\right]. 
+\end{equation}
+
+
+\begin{equation}
+E_i = \pi^2G\rho_c^2   \left[- \frac{4r^5}{5} +  \frac{14r^6}{18R}  -  \frac{3r^7}{14R^2} +  \frac{5}{18}r^3 R^2\right]. 
+\end{equation}
+
+
+\noindent Evaluate at $R$ to get total internal energy, 
+
+\begin{equation}
+E_i = \pi^2G\rho_c^2   \left[- \frac{4R^5}{5} +  \frac{14R^6}{18R}  -  \frac{3R^7}{14R^2} +  \frac{5}{18}R^3 R^2\right]. 
+\end{equation}
+
+\begin{equation}
+E_i = \pi^2G\rho_c^2   \left[- \frac{4R^5}{5} +  \frac{14R^5}{18}  -  \frac{3R^5}{14} +  \frac{5}{18}R^5\right]. 
+\end{equation}
+
+\noindent To get,
+
+\begin{equation}
+E_i = \frac{13}{315}\pi^2G\rho_c^2.
+\end{equation}
+
+\noindent To show that the virial theorem is satisfied, I need to show that,
+
+\begin{equation}
+2E_i + E_g = 0.
+\end{equation}
+
+\noindent So I must have dropped a factor of 2 somewhere but the signs between $E_i$ and $E_g$ are correct so the virial theorem is is satisfied, modulo a factor of 2.\\
+
+\noindent \textbf{Problem 2} Assume the mean free path is $\lambda_{phot} = \left ( n_e\sigma_e)^{-1}\right)$ where $\sigma_e$ is the Thomson scattering cross section $ = 7 \times 10^{-24} \mathrm{cm}^2$.\\
+
+\noindent \textbf{(a)} Using 1D random walk arguments, show that $L=R^2 / \lambda_{phot}$ is the total distance a photon must travel if it starts its scattering career at the stellar center and eventually ends up at the surface $R$. \\
+
+\noindent Let's start with the equation for the total displacement of the photon,
+
+\begin{equation}
+d = \lambda_{phot}\sqrt{N}
+\end{equation}
+
+\noindent where $N$ is the number of scattering events and $d$, of course, is $R$. Logically, the total distance covered by the photon would be the number of scattering events multiplied by the mean free path. So,
+
+\begin{equation}
+\mathrm{total~distance} = \frac{R^2}{\lambda_{phot}}\lambda_{phot}^2 =  \frac{R^2}{\lambda_{phot}} .
+\end{equation}
+
+\noindent \textbf{(b)} Since the photons travel at the speed of light, $c$, find the time $\tau_{phot}$, required for the photon to travel from the stellar center to the surface. (Assume scattering processes are instantaneous).  \\
+
+\noindent Just from unit analysis we know that,
+
+\begin{equation}
+\tau_{phot} = \frac{R^2}{\lambda_{phot}} \frac{1}{c}.
+\end{equation}
+
+\noindent \textbf{(c)} Given an estimate for  $\tau_{phot}$, in units of years, for a star of mass $M/M{sun}$ and radius $R/R{sun}$. \\
+
+\noindent We know that $R_{sun} = 7 \times 10^{10} ~\mathrm{cm}$ and $c = 3 \times 10^{10} ~\mathrm{cm ~s^{-1}}$. So now we just need to come up with a value for $\lambda_{phot}$,
+
+\begin{equation}
+\lambda_{phot} = \left ( n_e\sigma_e \right )^{-1}
+\end{equation}
+
+\noindent where $n_e$ is the number density of electrons in the star which we can obtain by assuming the gas in the star has the density of water,
+
+%\begin{equation}
+%\rho = \frac{m}{\frac{4}{3}\pi r^3} = 9.8 \times 10^{12}
+%\end{equation}
+
+\begin{equation}
+n_e = \frac{\rho}{m_p \mu} = \frac{1}{2\times 10^{-24} ~0.61} \sim 10^{24} \mathrm{cm}^3
+\end{equation}
+
+
+\noindent so $\lambda_{phot}$ is,
+\begin{equation}
+\lambda_{phot} = \left ( 10^{24} ~ 0.7 \times10^{-24} \right )^{-1} =  1 \mathrm{cm}.
+\end{equation}
+
+\noindent We can put all these values into the equation from part b to get,
+
+
+\begin{equation}
+\tau_{phot} = \frac{\left( 7 \times 10^{10} \right)^2}{1.} \frac{1}{3 \times 10^{10}} \sim 10^{11} s \sim 3\times10^4 \mathrm{yr} .
+\end{equation}
+
+
+\noindent \textbf{Problem 3}\\
+
+\noindent \textbf{(a)} Derive an expression for $\beta = P_{gas}/\left ( P_{gas} + P_{rad}\right)$, the fraction of the total pressure provided by gas, in terms of the gas density $\rho$ and the temperature $T$. Using this result, obtain the relationship between density and temperature in a gas for which $\beta = 0.1$. Evaluate the temperature required to satisfy this condition for $\rho$ = 10 gm cm$^{-1}$. \\
+
+\begin{equation}
+P_{gas} = \frac{R}{\mu}\rho T
+\end{equation}
+
+\begin{equation}
+P_{rad} = \frac{a}{3}T^4
+\end{equation}
+
+\begin{equation}
+\beta =  \frac{\frac{R}{\mu}\rho T}{  \frac{R}{\mu}\rho T +   \frac{a}{3}T^4 }
+\end{equation}
+
+\noindent For $\beta = 1$ and $\mu = 0.61$ (solar metallicity)
+
+\begin{equation}
+0.1 =  \frac{\frac{R}{0.61}\rho T}{  \frac{R}{0.61}\rho T +   \frac{a}{3}T^4 }
+\end{equation}
+
+\begin{equation}
+0.1 =  \frac{\frac{R}{0.61}\rho T}{  T\left ( \frac{R}{0.61}\rho +   \frac{a}{3}T^3 \right) }
+\end{equation}
+
+\begin{equation}
+0.1 =  \frac{\frac{R}{0.61}\rho}{ \left ( \frac{R}{0.61}\rho +   \frac{a}{3}T^3 \right) }
+\end{equation}
+
+
+\begin{equation}
+0.1 \left ( \frac{R}{0.61}\rho +   \frac{a}{3}T^3 \right)  =  \frac{R}{0.61}\rho
+\end{equation}
+
+\begin{equation}
+\frac{0.1a}{3}T^3  =  \frac{R}{0.61}\rho - \frac{0.1R}{0.61}\rho
+\end{equation}
+
+
+\begin{equation}
+\frac{0.1a}{3}T^3  =  \frac{0.9R}{0.61}\rho 
+\end{equation}
+
+\begin{equation}
+T^3  =  \frac{0.9R}{0.61}\frac{3}{0.1a}\rho 
+\end{equation}
+
+\noindent $a$ is the radiation constant so 
+
+
+\begin{equation}
+T^3  =  \frac{0.9R}{0.61}\frac{3}{0.756 \times 10^{-15}}\rho 
+\end{equation}
+
+
+\begin{equation}
+T =  \left[ 5.85 R\rho \right]^{1/3} 
+\end{equation}
+
+\noindent for $\rho = 10 $
+
+\begin{equation}
+T =  \left[ 58.5 ~R  \right]^{1/3} 
+\end{equation}
+
+\noindent \textbf{(b)} Instead of a gas-radiation fluid of fixed density and temperature, consider one of fixed density and total pressure. Derive quartic equation for $\beta$ in terms of $P$ and $\rho$. Obtain solutions to the equation in the limes as pressure goes to 0 and infinity.
+
+\begin{equation}
+\beta = \frac{P_{gas}}{P_{tot}}
+\end{equation} 
+
+\noindent Since $P_{tot}$ = constant 
+
+\begin{equation}
+T = \frac{\beta P_{tot}}{\frac{R}{\mu}\rho}
+\end{equation}
+
+\begin{equation}
+P_{tot} = \beta P_{tot} + \frac{1}{3}aT^4
+\end{equation}
+
+\begin{equation}
+P_{tot} = \beta P_{tot} + \frac{1}{3}a\left (\frac{\beta P_{tot}}{\frac{R}{\mu}\rho}  \right) ^4
+\end{equation}
+
+
+\begin{equation}
+P_{tot} = \beta P_{tot} + \frac{1}{3}a \frac{\beta^4 P_{tot}^4}{\left(\frac{R}{\mu}\right)^4 \rho^4}  
+\end{equation}
+
+\begin{equation}
+0 = \beta P_{tot} + \beta^4 \frac{aP_{tot}^4}{\left(3\frac{R}{\mu}\right)^4 \rho^4}  - P_{tot}
+\end{equation}
+
+\noindent Divide out a $P_{tot}$ from the equation 
+\begin{equation}
+0 = \beta + \beta^4 \frac{aP_{tot}^3}{\left(3\frac{R}{\mu}\right)^4 \rho^4}  - 1
+\end{equation}
+
+
+\noindent So when $P_{tot}$ goes to zero, $\beta = 1$. And, when $P_{tot}$ goes to infinity, $\beta = 0$ 
+
+\noindent \textbf{(c)} Let $U = U_{gas} + U_{rad}$ be the total energy in a star, including both gas and radiation. Assume that $\beta$ is uniform throughout the star. Show that the virial theorem implies that the total energy of the star is $E = U + \Omega = \left( \beta/2\right)\Omega$, where $\Omega$ is the gravitational binding energy. What do conclude about how strongly bound a massive, radiation-dominated star is compare to a low-mass star that has negligible radiation pressure support?\\
+
+\noindent Let's start with the definition of the total internal energy in a star,
+
+\begin{equation}
+U_{tot} = \int_0^M u dm.
+\end{equation}
+
+\noindent Where,
+
+\begin{equation}
+\zeta u = \int_0^M 3 \frac{P_{tot}}{\rho} dm.
+\end{equation}
+
+\noindent We can write $U_{tot}$ as, 
+
+\begin{equation}
+U_{tot} = \frac{3}{\zeta} \left  [ \int_0^M  \frac{P_{gas}}{\rho}dm  + \int_0^M  \frac{P_{rad}}{\rho}dm \right] .
+\end{equation}
+
+\noindent We can write both $P_{rad}$ and $P_{gas}$ in terms of $P_{tot}$,
+
+\begin{equation}
+U_{tot} = \frac{3}{\zeta} \left  [ \int_0^M  \frac{\beta P_{tot}}{\rho}dm  + \int_0^M  \frac{\beta \left( 1 - P_{tot} \right)}{ \rho}dm \right] .
+\end{equation}
+
+\noindent which by definition (and some very questionable algebra) can be written as 
+
+\begin{equation}
+U_{tot} = \frac{3}{\zeta} \left[ \beta - U_{tot}\beta + \beta U_{tot}\right] = \frac{3}{\zeta}\beta.
+\end{equation}
+
+
+\begin{equation}
+- \Omega =  \frac{3}{\zeta}\beta
+\end{equation}
+
+\begin{equation}
+E_{tot} = -\frac{\Omega \zeta }{3\beta} 
+\end{equation}
+\noindent So...not quite. I don't understand what the right thing to do with the $\zeta$ factor is when I break the $U_{tot}$ equation up like I did in equation 59.
+
+\end{document}
