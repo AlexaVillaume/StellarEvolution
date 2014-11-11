@@ -1,0 +1,384 @@
+\documentclass[12pt]{article}
+ \usepackage{amsmath}
+ \usepackage{mathtools}
+ \usepackage{accents}
+\usepackage{hyperref}
+
+
+ \newcommand*{\dt}[1]{%
+  \accentset{\mbox{\large\bfseries .}}{#1}}
+  
+ \begin{document}
+ 
+ \title{Problem Set 3}
+\author{Alexa Villaume\\ 
+Stellar Evolution } 
+ 
+\maketitle
+ 
+\noindent \textbf{Problem 1 Polytrope whatnots}\\
+\noindent \textbf{(a)} Derive the relation between $M$ and $R$ for polytropes. How does it depend on $n$? Discuss what kinds of objects might be close to $n=0, 1, 1.5$ polytropes and how their radii change by adding mass. \\
+
+\noindent Let's begin with what we know about $M$,
+
+\begin{equation}
+dm = \int_0^R 4\pi r^2 \rho dr,
+\end{equation}
+
+\noindent and what we know about some of these values for polytropes,
+
+\begin{equation}
+r = r_n \xi, dr = r_n d\xi,
+\end{equation}
+
+\begin{equation}
+\rho = \rho_c \Theta^n.
+\end{equation}
+
+\noindent Which we can plug back in to the $dm$ equation,
+
+\begin{equation}
+dm = \int_0^\xi 4\pi\left( r_n \xi \right)^2 \left( \rho_c \Theta_n \right) \left( r_n d\xi \right).
+\end{equation}
+
+\noindent Taking the constants out of the integral,
+
+\begin{equation}
+dm = 4\pi \rho_c r_n^2 \int_0^\xi \xi^2 \Theta_n d\xi.
+\end{equation}
+
+\noindent We can substitute the Lane-Emden equation,
+
+\begin{equation}
+-\Theta_n^n = \frac{1}{\xi^2}\frac{d}{d\xi}\left(\xi^2 \frac{d\Theta_n}{d\xi} \right),
+\end{equation}
+
+\noindent into the integral to get,
+
+\begin{equation}
+dm = -4\pi \rho_c r_n^2 \int_0^\xi \xi^2 \left[ \frac{1}{\xi^2} \frac{d}{d\xi} \left( \xi^2 \frac{d\Theta_n}{d\xi} \right) \right] d\xi.
+\end{equation}
+
+\noindent Now, we just start simplifying,
+
+\begin{equation}
+dm = -4\pi \rho_c r_n^2 \int_0^\xi \frac{d}{d\xi} \left( \xi^2 \frac{d\Theta_n}{d\xi} \right) d\xi.
+\end{equation}
+
+\noindent We can take the integral,
+
+\begin{equation}
+dm = -4\pi \rho_c r_n^2 \left( \xi^2 \frac{d\Theta_n}{d\xi} \right).
+\end{equation}
+
+\noindent Now we can start substituting in for things we know. Like,
+
+\begin{equation}
+r_n = \sqrt{\frac{\left( n + 1 \right)P_c}{4\pi\rho_c^2 G}}, r_n^3 = \left[ \frac{\left( n + 1 \right)P_c}{4\pi\rho_c^2 G} \right]^{2/3} \frac{1}{\rho_c^3}
+\end{equation}
+
+\begin{equation}
+dm = -4\pi \left[ \frac{\left( n + 1 \right) P_c}{4\pi\rho_c^2 G} \right]^{2/3} \frac{1}{\rho_c^3} \rho_c \xi^2 \frac{d\Theta_n}{d\xi}
+\end{equation}
+
+\noindent Since $P_c = K \rho_c^{1 =1/n}$,
+
+\begin{equation}
+dm = -4\pi \left[ \frac{\left( n + 1 \right)}{4\pi G} \right]^{2/3} \left(K \rho_c^{1+ 1/n}\right)^{2/3}  \frac{1}{\rho_c^2}  \xi^2 \frac{d\Theta_n}{d\xi}
+\end{equation}
+
+\noindent Where we can simplify the $\rho_c$ term,
+
+
+\begin{equation}
+dm = -4\pi \left[ \frac{\left( n + 1 \right)K }{4\pi G} \right]^{2/3} \rho_c^{\frac{3-n}{2n}} \xi^2 \frac{d\Theta_n}{d\xi}
+\end{equation}
+
+\noindent And we'll solve for $\rho_c$, 
+
+\begin{equation}
+\rho_c = \left[ \frac{M}{4\pi} \left[\xi^2\left( \frac{-d\Theta_n}{d\xi}\right) \right]^{-1} \left[ \frac{4\pi G}{\left( n + 1 \right) K} \right]^{3/2} \right]^{\frac{2n}{3-n}}
+\end{equation}
+
+\noindent $r=r_n\xi$ can be written in terms with our derived $\rho_c$ value,
+
+\begin{equation}
+r = \left[ \frac{\left( n + 1 \right)K}{4\pi G} \right]^{1/2}\left[ \frac{M}{4\pi} \left[\xi^2\left( \frac{-d\Theta_n}{d\xi}\right) \right]^{-1} \left[ \frac{4\pi G}{\left( n + 1 \right) K} \right]^{3/2} \right]^{\frac{2n}{3-n}}
+\end{equation}
+
+\noindent Since that is a big, awful mess I'm going to ignore everything but $R$ and $M$ and say,
+
+\begin{equation}
+R \propto M^{\frac{1-n}{3-n}}
+\end{equation}
+
+\begin{itemize}
+\item $n=0$, as the radius increases, mass increases. Examples of this would be small planets, moons, etc...
+\item $n=1$, radius does not depend on mass. Like gas giants and brown dwarfs.
+\item $n=3/2$, and the radius decreases, mass increases so a very centrally dense object like a white dwarf.
+\end{itemize}
+
+\noindent \textbf{(b)} For a polytropic star of mass $M$, radius $R$, and polytropic index $n$, find an expression for the gravitational potential energy. \\
+
+\noindent Let's start with equation 19.37 from Kippenhan,
+
+\begin{equation}
+E_g = \frac{1}{2}\int^M_0 \Phi dm - \frac{1}{2}\frac{GM^2}{R}
+\end{equation}
+ 
+\noindent We know that $P=K\rho^{1+\frac{1}{n}}$, $K = \frac{P}{\rho}^{1 +\frac{1}{n}}$ so we can get,
+
+\begin{equation}
+\Phi = - K\left( n + 1 \right) \rho^{1/}
+\end{equation}
+
+\begin{equation}
+\Phi = - \frac{P\left( n + 1 \right) \rho^{1/n}}{\rho^{1 + 1/n}}
+\end{equation}
+
+\begin{equation}
+\Phi = -\frac{P}{\rho}\left( n + 1 \right)
+\end{equation}
+
+\noindent So equation 19.37 becomes,
+
+\begin{equation}
+E_g = -\frac{1}{2} \frac{GM^2}{R} - \frac{\left( n +1 \right)}{2}\int_0^M \frac{P}{\rho}dm.
+\end{equation}
+
+\noindent We also know,
+
+\begin{equation}
+\int_0^M \frac{Gm}{r}dm = 3\int_0^M \frac{P}{\rho}dm
+\end{equation}
+
+\noindent and, 
+
+\begin{equation}
+E_g = -\int_0^M \frac{Gm}{r}dm.
+\end{equation}
+
+\noindent which means,
+
+\begin{equation}
+\frac{1}{3}\int_0^M\frac{Gm}{r} = \int_0^M \frac{P}{\rho}dm
+\end{equation}
+
+\begin{equation}
+\int_0^M \frac{P}{\rho}dm = -\frac{1}{3}E_g
+\end{equation}
+
+\noindent which we can put back into equation 19.37,
+
+\begin{equation}
+E_g = -\frac{1}{2}\frac{GM^2}{R} + \frac{1}{6}\left(n + 1 \right)E_g.
+\end{equation}
+
+\noindent And now it's just a matter of solving for $E_g$
+
+\begin{equation}
+E_g\left( 1 - \frac{n+1}{6} \right) = -\frac{1}{2}\frac{GM^2}{R}
+\end{equation}
+
+\begin{equation}
+E_g = -\frac{GM^2}{2R}\left( \frac{1}{1 - \frac{\left( n + 1\right)}{6}} \right)
+\end{equation}
+
+\noindent So let's unpack that second term,
+
+\begin{equation}
+\left( \frac{1}{1 - \frac{\left( n + 1\right)}{6}} \right) = \left( \frac{1}{\frac{6}{6} - \frac{\left( n + 1\right)}{6}} \right) = \left( \frac{1}{\frac{6 - \left(n + 1 \right)}{6}}\right) = \frac{6}{5 -n}
+\end{equation}
+
+\noindent Which we can put back into the equation to get,
+
+\begin{equation}
+E_g = -\frac{GM^2}{2R}\left(   \frac{6}{5 -n} \right) =  -\frac{GM^2}{R}\left(   \frac{3}{5 -n} \right)
+\end{equation}
+\\
+\noindent \textbf{Problem 2} As mentioned in class, there $are$ physical objects with a polytrope index close to $n=1$. They are giant planets and brown dwarfs. In class we wrote that $\Theta_1 = \left( sin \xi \right)/\xi$. Let's work with Jupiter, which as a radius of 70,000 km (1 $R_j$) and a mass of $1.9 \times 10^{30}$ g (1 $M_j$).\\
+
+ 
+ \noindent \textbf{(a)} Show that  $\Theta_1 = \left( sin \xi \right)/\xi$ and find $\xi_1$. \\
+ 
+ \noindent Let's begin with the Lane-Emden equation,
+
+\begin{equation}
+-\Theta_n^n = \frac{1}{\xi^2}\frac{d}{d\xi}\left ( \xi^2 \frac{d\Theta_n}{d\xi}\right).
+\end{equation}
+
+\noindent Now we'll re-arrange and acknowledge that $n=1$,
+
+\begin{equation}
+-\xi^2\Theta_n = \frac{d}{d\xi}\left ( \xi^2 \frac{d\Theta_n}{d\xi}\right).
+\end{equation}
+
+\noindent Let's assume the solution and substitute it into the above equation, 
+\begin{equation}
+-\xi^2 \left( sin \xi \right)/\xi = \frac{d}{d\xi}\left ( \xi^2 \frac{d\left( sin \xi \right)/\xi}{d\xi}\right),
+\end{equation}
+
+\noindent and then use the Chain Rule to start simplifying, 
+
+\begin{equation}
+-\xi^2 \left( sin \xi \right)/\xi =  \frac{d}{d\xi}\left ( \frac{\xi\mathrm{cos}\xi - \mathrm{sin}\xi}{\xi}\right),
+\end{equation}
+
+\noindent Which we can simplify further to get,
+
+\begin{equation}
+-\xi \left( sin \xi \right)/\xi = -\xi \left( sin \xi \right)/\xi.
+\end{equation}
+
+\noindent To get $\xi_1$ we just need to know what value brings $\Theta\left(\xi_1\right) = 0$, which is $\pi$.  \\
+
+\noindent \textbf{(b)} Using what is given above, solve for $K$. \\
+
+\begin{equation}
+R = \xi R_{n} = \xi \sqrt{\frac{\left( n + 1\right)P_c}{4\pi G\rho_c^2}},
+\end{equation}
+
+\begin{equation}
+P_c = K \rho_c^{1 + \frac{1}{n}}
+\end{equation}
+  
+\begin{equation}
+R = \xi \sqrt{\frac{\left( n + 1\right)K  \rho_c^{1 + \frac{1}{n}}}{4\pi G\rho_c^2}},
+\end{equation}
+
+\noindent Since $n=1$
+
+\begin{equation}
+R = \xi \sqrt{\frac{\left( n + 1\right)K }{4\pi G}},
+\end{equation}
+  
+\noindent Solving for $K$, 
+
+\begin{equation}
+K = \frac{4\pi G R^2}{\xi^2 \left( n+1\right)}
+\end{equation}
+  
+\noindent We can plug in values, to get, 
+
+\begin{equation}
+K = \frac{2 G R_j^2}{\pi } = 2.082 \times 10^{12}
+\end{equation}
+
+\noindent \textbf{(c)} Now solve for the central density, $\rho_c$. \\
+
+\begin{equation}
+\frac{\rho_c}{\left< \rho \right>} = \frac{1}{3}\left( \frac{\xi}{-\Theta^{'}_n}\right)_{\xi_1}
+\end{equation}
+
+\begin{equation}
+\frac{\rho_c}{\left< \rho \right>} = \frac{1}{3}\left( \frac{\xi_1}{-cos \xi_1}\right)_{\xi_1} = \frac{\pi}{3}.
+\end{equation}
+
+\begin{equation}
+\rho_c = \frac{\pi}{3}\frac{M}{V} = \frac{\pi}{4}\frac{M_j}{R_j^3} =  4.35
+\end{equation}
+
+\noindent \textbf{(d)} In cgs units, write out the density as a function of $r$, $\rho\left( r\right)$.\\
+
+\begin{equation}
+\rho \left( r \right) = \Theta^n\left( r \right) \rho_c
+\end{equation}
+
+\noindent We know from 2b that $\Theta_1 = \left( sin \xi \right)/\xi$ and from the scale height relation that $\xi = r/r_n$ so, 
+
+\begin{equation}
+\Theta_1 = \frac{\mathrm{sin}\left( r/r_n \right)}{r/r_n}
+\end{equation}
+
+\noindent
+
+\begin{equation}
+r_n = \sqrt{\frac{\left(n+1\right)P_c}{4\pi \rho_c^2 G}}
+\end{equation}
+
+\noindent Since for an $n=1$ polytrope $P_c = K\rho^2$ we can simplify the expression for the scale-height, 
+
+\begin{equation}
+r_n = \sqrt{\frac{K}{2\pi G}}
+\end{equation}
+
+\noindent From 2b we know $K$,
+
+\begin{equation}
+r_n = \sqrt{\frac{2GR_j^2}{\pi}\frac{1}{2\pi G}} = \frac{R_j}{\pi}.
+\end{equation}
+
+\noindent Which we can substitute back into the expression for $\Theta_1$,
+
+\begin{equation}
+\Theta_1 = \frac{\mathrm{sin}\left( r\pi/R_j \right)}{r\pi/R_j}
+\end{equation}
+
+\noindent So, then, $p\left (r\right)$ is given by,
+
+\begin{equation}
+p\left (r\right) = \Theta\left(r \right)\rho_c.
+\end{equation}
+
+\noindent \textbf{(e)} Plot pressure vs. density, and density vs. radius for the polytrope Jupiter, and compare those to a ``real'' Jupiter model at \url{http://www.ucolick.org/~jfortney/classes/Jup_Guillot99.dat}.\\
+
+\noindent Figures below. \\
+
+\noindent \textbf{(f)} Using what you know, solve for the radius of a 50 $M_j$, $n=1$ polytrope. \\
+
+\noindent We know from 1a that for a $n=1$ polytrope the radius does not change as a function of mass. Therefore, the radius of a 50$M_j$ polytrope will be the same as a 1 $M_j$ polytrope.\\
+
+\noindent \textbf{(g)} Let's assume Jupiter, by number, is 0.9 H and 0.1 He, with the H fully ionized and the He not ionized. Find $\mu$ for Jupiter. \\
+
+\noindent Since Helium is not ionized we begin with the following equation,
+
+\begin{equation}
+\mu = \left ( \Sigma_i  \frac{X_i \left( 1 + Z_i\right) }{\mu_i} \right)^{-1}.
+\end{equation}
+
+\noindent Where $X_i$ is the mass fraction of a given species, $Z_i$ is the number of electrons, and $\mu_i$ is the molecular weight. Since Hydrogen is ionized $Z_H$ = 1 and since Helium is not ionized $Z_{He}$ = 0 and $\mu_H \approx$  1 and $\mu_{He} \approx$  4. We're given the fraction by number which we have to turn into a mass fraction. This is done by, \\
+
+\begin{equation}
+\mathrm{Mass}_H = \frac{0.9M_H}{0.9M_H + 0.1M_{He}} = 0.69,
+\end{equation}
+
+and,
+
+\begin{equation}
+\mathrm{Mass}_{He} = \frac{0.1M_{He}}{0.9M_H + 0.1M_{He}} = 0.31.
+\end{equation}
+
+\noindent Putting everything back into the original equation to get, $\mu \approx$ 0.68.\\
+
+\noindent \textbf{(h)} Assuming that the ideal gas law hold, plot the pressure vs. temperature for real Jupiter and the polytrope. Do you think that the ideal gas law holds?\\
+ 
+\noindent Figure below. Given the large difference in the real model and my solution, I would say that the ideal gas law \textit{doesn't} hold.\\
+
+\noindent \textbf{Problem 3} Program the subroutines ``load1'' and ``load2'' to use in ``shootf''. Note that the central pressure $P_c$, the central temperature $T_c$, and the total luminosity $L$, and the outer radius $R$ are parameters that you guess in advance. Stellar $M$ and $\mu$ are chosen. Recall that helpful surface conditions are that $L_{tot} = 4\pi R^2 \sigma T_{eff}^4$ and $\kappa P = 2g/3$. \\
+
+\noindent Program can be found at \url{https://github.com/AlexaVillaume/StellarEvolution/blob/master/ProblemSet_3/shootf.py} \\
+
+\noindent \textbf{Problem 4} Program the subroutine ``derives''. For an independent variable $x$ (the mass coordinate) and the four dependent variables $y_i$ at that point, the subroutine should calculate $dy_i/dx$. \\
+
+\noindent Program can be found at \url{https://github.com/AlexaVillaume/StellarEvolution/blob/master/ProblemSet_3/shootf.py} \\
+
+\begin{figure}[b]
+  \vspace{-30pt}
+  \begin{center}
+    \includegraphics[width=1\textwidth]{plot_2_e.pdf}
+  \end{center}
+  \vspace{-20pt}
+  \vspace{-15pt}
+\end{figure}  % figures there
+ 
+ 
+ \begin{figure}[t]
+  \vspace{-30pt}
+  \begin{center}
+    \includegraphics[width=0.75\textwidth]{plot_2_h.pdf}
+  \end{center}
+  \vspace{-20pt}
+  \vspace{-15pt}
+\end{figure}  % figures there
+ 
+\end{document}
