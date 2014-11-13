@@ -12,6 +12,7 @@ import calc_density
 """
 Constants:
 """
+# make these variables expressive i.e. what are they actually are
 G = 6.673e-8           # cm^3 g^-1 s^-2
 c = 3e10               # cm s^-1
 sigma  = 5.67e-5       # erg cm^-2 s^-1 K^-1
@@ -21,11 +22,12 @@ del_ad = 0.4
 k = 1.38e-16           # ergs K^-1
 
 # For the Sun
+# make a STAR OBJECT!! Fill in somehow! Pass that object into shootf
 pressure_c = 2.526e14  # g cm^-2
 temperature_c = 1.57e7 # K
 total_lum = 3.846e33   # erg s^-1
-total_radius = 7e10     # cm
-total_mass = 1.98e33    #g
+total_radius = 7e10    # cm
+total_mass = 1.98e33   # g
 
 mass_initial = 1e-6
 density_surface = 10e-7
@@ -134,6 +136,7 @@ def inward_start(test=True):
 
     return [surface_pressure, t_eff, total_radius, total_lum]
 
+# I should make an input object
 def derivs(pressure, temperature, radius, luminosity, mass):
     """
     The mass given should be the enclosed mass, deal with that
@@ -162,3 +165,5 @@ if __file__ == sys.argv[0]:
     surface =  inward_start()
     print derivs(core[0], core[1], core[2], core[3], mass_initial)
     print derivs(surface[0], surface[1], surface[2], surface[3], total_mass)
+
+    # test on on multiple sets of stars (once I make star object)...abuse these functions
