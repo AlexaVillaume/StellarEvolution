@@ -105,7 +105,7 @@ guess outer radius and ltot
 
 return radius and l.
 """
-def load2(test=True):
+def inward_start(test=True):
     t_eff = calc_teff(total_radius, total_lum)
     mu = calc_density.mu_is(X, Y)
 
@@ -155,6 +155,6 @@ def derivs(pressure, temperature, radius, luminosity, mass):
     return [dpressure_dm, dtemperature_dm, dradius_dm, dluminoisty_dm]
 
 core =  outward_start(mass_initial)
-surface =  load2()
+surface =  inward_start()
 print derivs(core[0], core[1], core[2], core[3], mass_initial)
 print derivs(surface[0], surface[1], surface[2], surface[3], total_mass)
