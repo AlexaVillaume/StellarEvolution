@@ -154,7 +154,11 @@ def derivs(pressure, temperature, radius, luminosity, mass):
 
     return [dpressure_dm, dtemperature_dm, dradius_dm, dluminoisty_dm]
 
-core =  outward_start(mass_initial)
-surface =  inward_start()
-print derivs(core[0], core[1], core[2], core[3], mass_initial)
-print derivs(surface[0], surface[1], surface[2], surface[3], total_mass)
+"""
+Making testing suite.
+"""
+if __file__ == sys.argv[0]:
+    core =  outward_start(mass_initial)
+    surface =  inward_start()
+    print derivs(core[0], core[1], core[2], core[3], mass_initial)
+    print derivs(surface[0], surface[1], surface[2], surface[3], total_mass)
