@@ -9,58 +9,11 @@ import matplotlib.pyplot as plt
 import opacity_interpolation
 import calc_density
 
-"""
-Constants:
-"""
-# make these variables expressive i.e. what are they actually are
-G = 6.673e-8           # cm^3 g^-1 s^-2
-c = 3e10               # cm s^-1
-sigma  = 5.67e-5       # erg cm^-2 s^-1 K^-1
-a = 7.56464e-15        # ergs cm^-2 K^-4
-mass_h = 1.673e-24     # cgs
-del_ad = 0.4
-k = 1.38e-16           # ergs K^-1
-
-# For the Sun
-# make a STAR OBJECT!! Fill in somehow! Pass that object into shootf
-pressure_c = 2.526e14  # g cm^-2
-temperature_c = 1.57e7 # K
-total_lum = 3.846e33   # erg s^-1
-total_radius = 7e10    # cm
-total_mass = 1.98e33   # g
-
 mass_initial = 1e-6
-density_surface = 10e-7
-X = 0.70
-Y = 0.27
 
 def percent_difference(value1, value2):
     average = (math.fabs(value1) + math.fabs(value2))/2.
     return math.fabs(value1 - value2) / average
-
-def calc_luminosity(radius, temperature):
-    return 4.*math.pi*(radius**2)*sigma*temperature**4.
-
-def calc_teff(radius, luminosity):
-    return (luminosity/(4*math.pi*sigma*radius**2))**(1./4.)
-
-def calc_del_rad(density, pressure, temperature, opacity, luminosity, mass):
-    term1 = 3/(16*math.pi*a*c*G)
-    term2 = (opacity*luminosity*pressure)/(mass*temperature**4)
-    return term1*term2
-
-def pressure_from_ideal(density, t_eff, mu):
-    return (density*k*t_eff)/(mu*mass_h)
-
-def calc_other_pressure(opacity):
-    return (2*G*total_mass)/(3*opacity*total_radius**2)
-
-def find_intersection(function1, function2, xvalues):
-    return fsolve(lambda x: function1(x) - function2(x), xvalues)
-
-# Dummy function for now
-def calc_e_n(density, temperature):
-    return 1
 
 def outward_start(mass):
     """
@@ -108,6 +61,7 @@ guess outer radius and ltot
 return radius and l.
 """
 def inward_start(test=True):
+    density_surface = 10e-7
     t_eff = calc_teff(total_radius, total_lum)
     mu = calc_density.mu_is(X, Y)
 
