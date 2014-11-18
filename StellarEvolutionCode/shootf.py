@@ -25,53 +25,52 @@ def outward_start(mass):
     We'll start at some tiny value of m, with an
     assumed pressure_c and temperature_c.
     """
-    density_c = calc_density.density_is(math.log10(temperature_c), math.log10(pressure_c), X, Y)
-    e_n = calc_e_n(density_c, temperature_c)
+    core_density = calc_density.density_is(math.log10(temperature_c), math.log10(pressure_c), X, Y)
+    e_n = solar.calc_e_n(core_density, solar.core_temp)
 
     term1 = -(3.*G)/(8.*math.pi)
     term2 = (density_c*4.*math.pi/3.)**(4./3.)
     term3 = mass**(2./3.)
     pressure = term1*term2*term3 + pressure_c
-    luminosity_c = (e_n)*mass
+    core_luminosity = e_n*mass
 
-    opacity_c = 10**(opacity_interpolation.opacity_is(math.log10(temperature_c), math.log10(density_c)))
-    del_rad = calc_del_rad(density_c, pressure_c, temperature_c, opacity_c, luminosity_c, mass)
+    core_opacity = 10**(opacity_interpolation.opacity_is(math.log10(temperature_c), \
+                math.log10(density_c)))
+    del_rad = solar.calc_del_rad(core_density, solar.core_pressure, solar.core_temperature, \
+                core_opacity, core_luminosity, mass)
     if del_rad >= del_ad:
         # if temperature gradiant is greater than del_ad, then convective (because blobs are unstable)
         term1 = -(math.pi/6.)**(1./3.)
-        term2 =  (del_ad_c*density_c**(4./3.))/pressure_c
-        temperature = math.exp(term1*G*term2*mass**(2./3.) - math.log(temperature_c))
+        term2 =  (del_ad_c*core_density**(4./3.))/solar.core_pressure
+        temperature = math.exp(term1*utilities.gravitational_constant*term2*mass**(2./3.) \
+                    - math.log(solar.core_temp))
     else:
         # if not convective, then radiative
-        term1 = -1./(2.*a*c)
+        term1 = -1./(2.*utilities.radiation_density_constant*utilities.speed_of_light)
         term2 = (3/(4*math.pi))**(2./3.)
-        term3 = opacity_c*(e_n)*density_c**(4./3.)
+        term3 = core_opacity*(e_n)*core_density**(4./3.)
         term4 = mass**(2./3.)
-        temperature = (temperature_c**4 - term1*term2*term3*term4)**(1./4.)
+        temperature = (solar.core_temp**4 - term1*term2*term3*term4)**(1./4.)
 
-    radius = (3./(4.*math.pi*density_c))**(1./3.) * mass**(1./3.)
+    radius = (3./(4.*math.pi*core_density))**(1./3.) * mass**(1./3.)
 
-    return [pressure, temperature, radius, luminosity_c]
+    return [pressure, temperature, radius, core_luminosity]
 
-"""
-Computing the initial guesses at the surface.
-
-guess outer radius and ltot
-
-return radius and l.
-"""
 def inward_start(test=True):
-    density_surface = 10e-7
-    t_eff = calc_teff(total_radius, total_lum)
-    mu = calc_density.mu_is(X, Y)
+    """
+    Computing the initial guesses at the surface.
+
+    guess outer radius and ltot
+    """
+    surface_density = 10e-7
 
     # Make an array of density values
-    densities = np.linspace(1e-9,density_surface,1e5)
+    densities = np.linspace(1e-9,surface_density,1e5)
     # Calculate corresponding pressure arrays
-    pressures1 = np.asarray([pressure_from_ideal(density, t_eff, mu) for density in densities])
+    pressures1 = np.asarray([solar.pressure_from_ideal(density) for density in densities])
     # Calculate an array of opacity values for computing pressure2
-    opacities = [10**opacity_interpolation.opacity_is(math.log10(t_eff), math.log10(density)) for density in densities]
-    pressures2 = np.asarray([calc_other_pressure(opacity) for opacity in opacities])
+    opacities = [10**opacity_interpolation.opacity_is(math.log10(teff), math.log10(density)) for density in densities]
+    pressures2 = np.asarray([solar.calc_other_pressure(opacity) for opacity in opacities])
 
     intersection_index = np.abs(pressures1 - pressures2).argmin(0)
     # Need to address what to do if more then one index is returned
@@ -88,7 +87,7 @@ def inward_start(test=True):
         plt.yscale('log')
         plt.show()
 
-    return [surface_pressure, t_eff, total_radius, total_lum]
+    return [surface_pressure, teff, total_radius, total_lum]
 
 # I should make an input object
 def derivs(pressure, temperature, radius, luminosity, mass):
