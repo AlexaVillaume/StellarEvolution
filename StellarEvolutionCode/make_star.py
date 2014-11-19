@@ -3,6 +3,7 @@ This will be the control program for running the stellar evolution code.
 """
 import sys
 import math
+import numpy as np
 from scipy.optimize import newton
 import calc_density
 import shootf
@@ -57,10 +58,11 @@ class star(object):
 # All values for the Sun
 solar = star(2.526e14, 1.57e7, 3.846e33, 7e10, 1.98e33, 0.70, 0.27)
 solar.teff = solar.calc_teff()
-core = shootf.outward_start(solar, mass_step)
-surface =  shootf.inward_start(solar)
-print shootf.derivatives(solar, core, mass_step)
-print shootf.derivatives(solar, surface, solar.total_mass)
+
+outward_masses = np.linspace(mass_step, solar.total_mass/2., 1e2)
+inward_masses = np.linspace(solar.total_mass/2., solar.total_mass,  1e2)
+
+print shootf.integrate(solar, outward_masses, inward_masses, mass_step)
 
 # func, x0, fprime
 #newton()

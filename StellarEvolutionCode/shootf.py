@@ -95,8 +95,7 @@ def inward_start(star, test=True):
 
     return [surface_pressure, star.teff, star.total_radius, star.total_lum]
 
-# I should make an input object
-def derivatives(star, layer, mass):
+def derivatives(layer, mass, star):
     """
     The mass given should be the enclosed mass, deal with that
     outside the function.
@@ -117,15 +116,15 @@ def derivatives(star, layer, mass):
     return [dpressure_dm, dtemperature_dm, dradius_dm, dluminoisty_dm]
 
 
-def integrate(star, outward_masses, inward_masses):
+def integrate(star, outward_masses, inward_masses, mass_initial):
     # Get outward and inward initial conditions
     outward_initial =  outward_start(star, mass_initial)
     inward_initial =  inward_start(star)
     #
-    outward_function = odeint(derivatives, outward_initial, outward_masses)
-    inward_function = odeint(derivatives, inward_initial, inward_masses)
+    outward_function = odeint(derivatives, outward_initial, outward_masses, args=(star,))
+    inward_function = odeint(derivatives, inward_initial, inward_masses, args=(star,))
 
-
+    return score_is()
 """
 Making testing suite.
 """
