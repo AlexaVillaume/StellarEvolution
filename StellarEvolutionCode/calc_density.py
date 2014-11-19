@@ -23,7 +23,7 @@ def rad_pressure_is(logT):
 
 def density_is(logT, logP, mass_hydrogen, mass_helium):
     mu = mu_is(mass_hydrogen, mass_helium)
-    top = 10**logP - ((0.33)*a*(10**logT)**4)
+    top = 10**logP - ((0.33)*utilities.radiation_density_constant*(10**logT)**4)
     bottom = utilities.gas_constant*(10**logT)
     return mu*(top/bottom)
 

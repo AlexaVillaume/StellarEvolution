@@ -13,13 +13,6 @@ def percent_difference(value1, value2):
     average = (math.fabs(value1) + math.fabs(value2))/2.
     return math.fabs(value1 - value2) / average
 
-def newt():
-    """
-    Use Newton's Method to adjust iniital conditions until we
-    can get score to go to zero.
-    """
-    return 1
-
 def score_is():
     """
     Evaluate and the return the difference between the inward and
@@ -103,25 +96,35 @@ def inward_start(star, test=True):
     return [surface_pressure, star.teff, star.total_radius, star.total_lum]
 
 # I should make an input object
-def derivs(star, pressure, temperature, radius, luminosity, mass):
+def derivatives(star, layer, mass):
     """
     The mass given should be the enclosed mass, deal with that
     outside the function.
     """
-    density = calc_density.density_is(math.log10(temperature), math.log10(pressure), star.hydrogen_mass, star.helium_mass)
-    opacity = 10**opacity_interpolation.opacity_is(math.log10(temperature), math.log10(density))
+    density = calc_density.density_is(math.log10(layer[1]), math.log10(layer[0]), star.hydrogen_mass, star.helium_mass)
+    opacity = 10**opacity_interpolation.opacity_is(math.log10(layer[1]), math.log10(density))
 
-    dpressure_dm = -((utilities.gravitational_constant)/(4*math.pi))*((mass)/(radius**4))
-    dradius_dm = (1./(4.*math.pi))*(1./(density*radius**2))
-    dluminoisty_dm = star.calc_e_n(density, temperature)
+    dpressure_dm = -((utilities.gravitational_constant)/(4*math.pi))*((mass)/(layer[2]**4))
+    dradius_dm = (1./(4.*math.pi))*(1./(density*layer[2]**2))
+    dluminoisty_dm = star.calc_e_n(density, layer[1])
 
-    del_rad = star.calc_del_rad(density, pressure, temperature, opacity, luminosity, mass)
+    del_rad = star.calc_del_rad(density, layer[0], layer[1], opacity, layer[3], mass)
     if del_rad >= utilities.del_adiabatic:
-        dtemperature_dm = -((utilities.gravitational_constant*mass*temperature)/(4*math.pi*pressure))*del_adiabatic
+        dtemperature_dm = -((utilities.gravitational_constant*mass*layer[1])/(4*math.pi*layer[0]))*del_adiabatic
     else:
-        dtemperature_dm = -((utilities.gravitational_constant*mass*temperature)/(4*math.pi*pressure))*del_rad
+        dtemperature_dm = -((utilities.gravitational_constant*mass*layer[1])/(4*math.pi*layer[0]))*del_rad
 
     return [dpressure_dm, dtemperature_dm, dradius_dm, dluminoisty_dm]
+
+
+def integrate(star, outward_masses, inward_masses):
+    # Get outward and inward initial conditions
+    outward_initial =  outward_start(star, mass_initial)
+    inward_initial =  inward_start(star)
+    #
+    outward_function = odeint(derivatives, outward_initial, outward_masses)
+    inward_function = odeint(derivatives, inward_initial, inward_masses)
+
 
 """
 Making testing suite.
@@ -129,7 +132,7 @@ Making testing suite.
 if __file__ == sys.argv[0]:
     core =  outward_start(star, mass_initial)
     surface =  inward_start(star)
-    print derivs(core[0], core[1], core[2], core[3], mass_initial)
-    print derivs(surface[0], surface[1], surface[2], surface[3], total_mass)
+    print derivatives(star, core, mass_initial)
+    print derivatives(star, surface, total_mass)
 
     # test on on multiple sets of stars (once I make star object)...abuse these functions

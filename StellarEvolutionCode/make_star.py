@@ -3,6 +3,7 @@ This will be the control program for running the stellar evolution code.
 """
 import sys
 import math
+from scipy.optimize import newton
 import calc_density
 import shootf
 import utilities
@@ -58,5 +59,18 @@ solar = star(2.526e14, 1.57e7, 3.846e33, 7e10, 1.98e33, 0.70, 0.27)
 solar.teff = solar.calc_teff()
 core = shootf.outward_start(solar, mass_step)
 surface =  shootf.inward_start(solar)
-print shootf.derivs(solar, core[0], core[1], core[2], core[3], mass_step)
-print shootf.derivs(solar, surface[0], surface[1], surface[2], surface[3], solar.total_mass)
+print shootf.derivatives(solar, core, mass_step)
+print shootf.derivatives(solar, surface, solar.total_mass)
+
+# func, x0, fprime
+#newton()
+
+def newt():
+    """
+    Use Newton's Method to adjust iniital conditions until we
+    can get score to go to zero.
+
+    This function controls the calls to shootf.
+    """
+    return 1
+
