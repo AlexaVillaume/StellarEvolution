@@ -20,7 +20,7 @@ def density_r(logT, logRho):
 # Read in the table and sort the values into the appropriate arrays
 logTs = []
 opacities = []
-with open('test_table.dat', 'r') as f:
+with open('Gz020x70_1.txt', 'r') as f:
     for i, row in enumerate(f):
         cols = row.split()
         if i == 0:
@@ -45,6 +45,6 @@ for i, blah in enumerate(opacities):
 
 function = interpolate.RectBivariateSpline(logTs, logRs, blargh)
 
-def get_opacity(temperature, density)
-    return function(temperature, density_r(temperature, density))
+def opacity_is(temperature, density):
+    return function(temperature, density_r(temperature, density))[0][0]
 

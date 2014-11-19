@@ -6,9 +6,13 @@ PURPOSE:
 CALLING SEQUENCE:
     rho = density_is(temperature, pressure, X, Y)
     Where,
-    X = abundance of hydrogen
-    Y = abundance of helium
+    X = mass fraction of hydrogen
+    Y = mass fraction of helium
 '''
+a = 7.56e-15 # radiation density constant [erg cm^-3 k^-4]
+k = 1.38e-16 # Boltzmann consant [erg K^-1]
+r = 8.32e7   # Gas constant [erg K^-1 mol^-1]
+
 def mu_is(X, Y):
     return 2./(1. + 3.*X + 0.5*Y)
 
