@@ -8,5 +8,5 @@ radiation_density_constant = 7.56464e-15   # ergs cm^-2 K^-4
 mass_of_hydrogen           = 1.673e-24     # cgs
 del_adiabatic              = 0.4
 boltzmann_constant         = 1.38e-16      # ergs K^-1
-
+gas_constant               = 8.32e7        # K^-1 mol^-1
 
