@@ -3,6 +3,7 @@
 import sys
 import math
 import numpy as np
+from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 import opacity_interpolation
 import calc_density
@@ -11,6 +12,20 @@ import utilities
 def percent_difference(value1, value2):
     average = (math.fabs(value1) + math.fabs(value2))/2.
     return math.fabs(value1 - value2) / average
+
+def newt():
+    """
+    Use Newton's Method to adjust iniital conditions until we
+    can get score to go to zero.
+    """
+    return 1
+
+def score_is():
+    """
+    Evaluate and the return the difference between the inward and
+    outward integration at the fitting point.
+    """
+    return 1
 
 def outward_start(star, mass):
     """
