@@ -12,6 +12,10 @@ import utilities
 mass_step = 1e-6
 
 def nond_temperature(temperature, power):
+    """
+    A function to non-dimesionlize temperature to be
+    consistent with Kippenhahn, Weigert, and Weiss.
+    """
     return temperature*10**power
 
 class star(object):
@@ -56,22 +60,19 @@ class star(object):
         return term1*term2
 
     def calc_e_n(self, density, temperature):
-        # Non-dimensionalize temperature
         t_6 = nond_temperature(temperature, 6)
         t_9 = nond_temperature(temperature, 9)
         if t_6 <= 15:
             # Use pp-chain
-            psi = 1 # need to fix
+            psi =  # need to fix
             f_11 = 1
             g_11 = 1. + 3.82*t_9 + 1.151*t_9**2 + 0.144*t_9**3 - 0.0114*t_9**4
-            X_1 = 1. # need to get real number
-            return (2.57e4)*psi*f_11*g_11*density(X_1**2)*(t_9**(-2./3.))*math.exp(-3.381/(t_9**(1./3.)))
+            return (2.57e4)*psi*f_11*g_11*density(self.hydrogen_mass**2)*(t_9**(-2./3.))*math.exp(-3.381/(t_9**(1./3.)))
         else:
             # Use CNO Chain
             g_14_1 = 1- 2.0*t_9 + 3.41*t_9**2 - 2.43*t_9**3
-            X_cno = 0.7
-            X_1 = 1. # need to get real number
-            return (8.24e25)*g_14_1*X_cno*X_1*density*(t_9**(-2./3.))*math.exp(-15.231*(t_9**(-1./3.)) - (t_9/0.8)**2)
+            X_cno = 0.7*0.03
+            return (8.24e25)*g_14_1*X_cno*self.hydrogen_mass*density*(t_9**(-2./3.))*math.exp(-15.231*(t_9**(-1./3.)) - (t_9/0.8)**2)
 
 # All values for the Sun
 solar = star(2.526e14, 1.57e7, 3.846e33, 7e10, 1.98e33, 0.70, 0.27)
