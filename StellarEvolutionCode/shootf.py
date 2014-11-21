@@ -18,7 +18,7 @@ def score_is():
     Evaluate and the return the difference between the inward and
     outward integration at the fitting point.
     """
-    return 1
+    return 0
 
 def outward_start(star, mass):
     """
@@ -95,23 +95,24 @@ def inward_start(star, test=True):
 
     return [surface_pressure, star.teff, star.total_radius, star.total_lum]
 
-def derivatives(layer, mass, star):
+def derivatives(layer, enclosed_mass, star):
     """
-    The mass given should be the enclosed mass, deal with that
+    The enclosed_mass given should be the enclosed enclosed_mass, deal with that
     outside the function.
     """
+    print layer[1]
     density = calc_density.density_is(math.log10(layer[1]), math.log10(layer[0]), star.hydrogen_mass, star.helium_mass)
     opacity = 10**opacity_interpolation.opacity_is(math.log10(layer[1]), math.log10(density))
 
-    dpressure_dm = -((utilities.gravitational_constant)/(4*math.pi))*((mass)/(layer[2]**4))
+    dpressure_dm = -((utilities.gravitational_constant)/(4*math.pi))*((enclosed_mass)/(layer[2]**4))
     dradius_dm = (1./(4.*math.pi))*(1./(density*layer[2]**2))
     dluminoisty_dm = star.calc_e_n(density, layer[1])
 
-    del_rad = star.calc_del_rad(density, layer[0], layer[1], opacity, layer[3], mass)
+    del_rad = star.calc_del_rad(density, layer[0], layer[1], opacity, layer[3], enclosed_mass)
     if del_rad >= utilities.del_adiabatic:
-        dtemperature_dm = -((utilities.gravitational_constant*mass*layer[1])/(4*math.pi*layer[0]))*del_adiabatic
+        dtemperature_dm = -((utilities.gravitational_constant*enclosed_mass*layer[1])/(4*math.pi*layer[0]))*utilities.del_adiabatic
     else:
-        dtemperature_dm = -((utilities.gravitational_constant*mass*layer[1])/(4*math.pi*layer[0]))*del_rad
+        dtemperature_dm = -((utilities.gravitational_constant*enclosed_mass*layer[1])/(4*math.pi*layer[0]))*del_rad
 
     return [dpressure_dm, dtemperature_dm, dradius_dm, dluminoisty_dm]
 
@@ -122,9 +123,17 @@ def integrate(star, outward_masses, inward_masses, mass_initial):
     inward_initial =  inward_start(star)
     #
     outward_function = odeint(derivatives, outward_initial, outward_masses, args=(star,))
+    # Something still funky going on with the temperature values for this
     inward_function = odeint(derivatives, inward_initial, inward_masses, args=(star,))
 
+    # Make this plot better.
+    plt.plot(outward_masses, outward_function, lw=3, color='r', label="Outward Integration")
+    plt.plot(inward_masses, inward_function, lw=3, color='b', label="Inward Integration")
+    plt.legend()
+    plt.show()
+    sys.exit()
     return score_is()
+
 """
 Making testing suite.
 """
