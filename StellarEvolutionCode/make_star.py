@@ -16,7 +16,7 @@ def nond_temperature(temperature, power):
     A function to non-dimesionlize temperature to be
     consistent with Kippenhahn, Weigert, and Weiss.
     """
-    return temperature*10**power
+    return temperature/(10**power)
 
 class star(object):
     def __init__(self, core_pressure, core_temp, total_lum, total_radius, total_mass, hydrogen_mass, helium_mass):
@@ -64,10 +64,13 @@ class star(object):
         t_9 = nond_temperature(temperature, 9)
         if t_6 <= 15:
             # Use pp-chain
-            psi =  1.5 # need to fix
+            if nond_temperature(temperature, 7) >= math.fabs(2 - 0.1):
+                psi =  2.0
+            else:
+                psi = 1.5
             f_11 = 1
             g_11 = 1. + 3.82*t_9 + 1.151*t_9**2 + 0.144*t_9**3 - 0.0114*t_9**4
-            return (2.57e4)*psi*f_11*g_11*density(self.hydrogen_mass**2)*(t_9**(-2./3.))*math.exp(-3.381/(t_9**(1./3.)))
+            return (2.57e4)*psi*f_11*g_11*density*(self.hydrogen_mass**2)*(t_9**(-2./3.))*math.exp(-3.381/(t_9**(1./3.)))
         else:
             # Use CNO Chain
             g_14_1 = 1- 2.0*t_9 + 3.41*t_9**2 - 2.43*t_9**3
@@ -77,6 +80,10 @@ class star(object):
 # All values for the Sun
 solar = star(2.526e14, 1.57e7, 3.846e33, 7e10, 1.98e33, 0.70, 0.27)
 solar.teff = solar.calc_teff()
+
+#print solar.calc_e_n(80, 18e6)
+
+#sys.exit()
 
 fitting_point = solar.total_mass/2.
 outward_masses = np.linspace(mass_step, fitting_point, 10e2)
