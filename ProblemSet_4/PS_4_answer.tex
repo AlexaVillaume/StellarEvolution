@@ -1,0 +1,96 @@
+\documentclass[12pt]{article}
+ \usepackage{amsmath}
+ \usepackage{mathtools}
+ \usepackage{accents}
+\usepackage{hyperref}
+
+
+ \newcommand*{\dt}[1]{%
+  \accentset{\mbox{\large\bfseries .}}{#1}}
+  
+ \begin{document}
+ 
+ \title{Problem Set 4}
+\author{Alexa Villaume\\ 
+Stellar Evolution } 
+ 
+\maketitle
+ 
+\noindent \textbf{Problem 1} In Section 18 of our text, there are many useful formulae for deriving important reaction quantities. Obtain the power-law temperature dependence and Gamow peak energies for the following reactions:\\
+
+\begin{itemize}
+\item $^{1}$H + $^{1}$H at $T_6 = 10, 15$
+\item $^{7}$Be + $^{1}$H at $T_6 = 15$
+\item $^{14}$N +  $^{1}$H at $T_6 = 15, 25$
+\end{itemize}
+ 
+\noindent \textbf{Problem 2} The minimum temperature required to fuse hydrogen is $T\sim4 \times 10^6$ K. Now consider a fully convective, fully ionized solar composition object at the star/brown dwarf dividing line. Let's assume that for fusion to occur, the object can't be supported by degeneracy pressure at the center. With this condition, what is the transition mass between stars and brown dwarfs? Put your answer in Solar masses and compare it the ``real'' number of 0.075 M$_{\odot}$. You'l want to use polytropes.\\
+ 
+ \noindent We can get the central density of this object, $\rho_c$, by equation the gas pressure,
+ 
+ \begin{equation}
+ P_{gas} = \frac{\mathcal{R}{\mu}}{\rho T} \mathrm{~dyne~cm^2}
+ \end{equation}
+ 
+and degeneracy pressure
+
+\begin{equation}
+P_{degeneracy} = 1.0036 \times 10^{13} \left( \frac{\rho}{\mu_e}\right)^{5/3} \mathrm{~dyne~cm^2}
+\end{equation}
+
+\noindent equal to each other and solve for $\rho$, 
+ 
+ \begin{equation}
+ \rho_c = \left( \frac{\mathcal{R}T}{\mu}\frac{mu_e^{5/3}}{1.0036 \times 10^{13}}\right)^{3/2} = 589 \mathrm{~g  ~cm^{-3}}
+ \end{equation}
+ 
+ \noindent We know that for an $n=1$,
+ 
+\begin{equation}
+\rho_c = \frac{\pi M}{4 R_j^3} 
+\end{equation}
+
+\noindent Which we can rearrange to get, 
+
+\begin{equation}
+M = \frac{4 \rho R_j^3}{\pi}
+\end{equation}
+
+\noindent Since mass doesn't depend on radius for an $n=1$ polytrope we can just use $R_j = 7 \times 10^9$ cm to get,
+
+\begin{equation}
+M =  0.12 M_{\odot}
+\end{equation} 
+
+\noindent Which is pretty close to the ``real'' number. \\
+
+\noindent \textbf{Problem 3} Consider an inhomogeneous fully ionized star that obeys the ideal gas law. It is all hydrogen exterior to some mass shell $m\left(r\right)$, and all helium interior of $m\left(r\right)$. Find the ratio of the interior density divided by exterior density at the density discontinuity $m\left(r\right)$. \\
+
+\noindent The ideal gas law is,
+
+\begin{equation}
+P = \frac{\rho}{\mu M_H} \kappa T 
+\end{equation}
+
+\noindent Let's set the ideal gas law for hydrogen density equal to the ideal gas law for helium density,
+
+\begin{equation}
+ \frac{\rho_{H}}{\mu M_H} \kappa T_{H}  =  \frac{\rho_{He}}{\mu M_H} \kappa T_{He} 
+\end{equation}
+
+\noindent And let's assume there is no discontinuity in temperature between the hydrogen exterior and helium interior to get,
+
+\begin{equation}
+\frac{\rho_H}{\rho_{He}} = \frac{\mu_H}{\mu_{He}} = \frac{1.00794}{4.002602} \approx \frac{1}{4}.
+\end{equation}
+
+% \begin{figure}[t]
+ % \vspace{-30pt}
+ % \begin{center}
+ %   \includegraphics[width=0.75\textwidth]{plot_2_h.pdf}
+%  \end{center}
+%  \vspace{-20pt}
+%  \vspace{-15pt}
+%\end{figure}  % figures there
+  
+\end{document}
