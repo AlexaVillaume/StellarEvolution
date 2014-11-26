@@ -5,17 +5,12 @@ import sys
 import math
 import numpy as np
 from scipy.optimize import newton
+import matplotlib.pyplot as plt
 import calc_density
 import shootf
 import utilities
 
 
-def nond_temperature(temperature, power):
-    """
-    A function to non-dimesionlize temperature to be
-    consistent with Kippenhahn, Weigert, and Weiss.
-    """
-    return temperature/(10**power)
 
 class star(object):
     def __init__(self, core_pressure, core_temp, total_lum, total_radius, total_mass, hydrogen_mass, helium_mass):
@@ -58,32 +53,14 @@ class star(object):
         term2 = (opacity*luminosity*pressure)/(mass*temperature**4)
         return term1*term2
 
-    def calc_e_n(self, density, temperature):
-        t_9 = nond_temperature(temperature, 9)
-        if nond_temperature(temperature, 7) >= math.fabs(2 - 0.1):
-            psi =  2.0
-        else:
-            psi = 1.5
-        f_11 = 1
-        g_11 = 1. + 3.82*t_9 + 1.151*t_9**2 + 0.144*t_9**3 - 0.0114*t_9**4
-        pp_e_n = (2.57e4)*psi*f_11*g_11*density*(self.hydrogen_mass**2)*(t_9**(-2./3.))*math.exp(-3.381/(t_9**(1./3.)))
-
-        g_14_1 = 1- 2.0*t_9 + 3.41*t_9**2 - 2.43*t_9**3
-        X_cno = 0.7*(1 - (self.hydrogen_mass + self.helium_mass))
-        cno_e_n = (8.24e25)*g_14_1*X_cno*self.hydrogen_mass*density*(t_9**(-2./3.))*math.exp(-15.231*(t_9**(-1./3.)) - (t_9/0.8)**2)
-
-        return pp_e_n + cno_e_n
-
 # All values for the Sun
 solar = star(2.526e14, 1.57e7, 3.846e33, 7e10, 1.98e33, 0.70, 0.28)
 solar.teff = solar.calc_teff()
 mass_step = 1e-8 * solar.total_mass
 
-fitting_point = solar.total_mass/2.
-inner_masses = np.logspace(math.log10(mass_step), math.log10(fitting_point), 10e1)
+fitting_point = solar.total_mass*0.8
+inner_masses = np.logspace(math.log10(mass_step), math.log10(fitting_point))
 outer_masses = np.logspace(math.log10(solar.total_mass),  math.log10(fitting_point), 10e2)
-
-#print inner_masses
 
 print shootf.integrate(solar, inner_masses, outer_masses, mass_step)
 
