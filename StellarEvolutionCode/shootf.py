@@ -13,14 +13,20 @@ def percent_difference(value1, value2):
     average = (math.fabs(value1) + math.fabs(value2))/2.
     return math.fabs(value1 - value2) / average
 
-def score_is():
+def difference_is(outward_values, inward_values):
     """
     Evaluate and the return the difference between the inward and
     outward integration at the fitting point.
     """
-    return 0
+    o_i = len(outward_values) - 1
+    i_i = len(inward_values) - 1
+    dpressure = percent_difference(outward_values[:,0][o_i], inward_values[:,0][i_i])
+    dtemperature = percent_difference(outward_values[:,1][o_i],  inward_values[:,1][i_i])
+    dradius = percent_difference(outward_values[:,2][o_i], inward_values[:,2][i_i])
+    dluminosity = percent_difference(outward_values[:,3][o_i], inward_values[:,3][i_i])
+    return (dpressure + dtemperature + dradius + dluminosity) /4.
 
-def outward_start(star, mass):
+def outward_start(star, mass, test=True):
     """
     Computing the initial guesses for pressure and
     temperture at the core.
@@ -32,7 +38,8 @@ def outward_start(star, mass):
     """
     core_density = calc_density.density_is(math.log10(star.core_temp), math.log10(star.core_pressure), \
                 star.hydrogen_mass, star.helium_mass)
-    e_n = star.calc_e_n(core_density, star.core_temp)
+
+    e_n = utilities.calc_e_n(star, core_density, star.core_temp)
 
     term1 = -(3.*utilities.gravitational_constant)/(8.*math.pi)
     term2 = (core_density*4.*math.pi/3.)**(4./3.)
@@ -45,20 +52,27 @@ def outward_start(star, mass):
     del_rad = star.calc_del_rad(core_density, star.core_pressure, star.core_temp, \
                 core_opacity, core_luminosity, mass)
     if del_rad >= utilities.del_adiabatic:
-        # if temperature gradiant is greater than del_ad, then convective (because blobs are unstable)
-        term1 = -(math.pi/6.)**(1./3.)
-        term2 =  (del_ad_c*core_density**(4./3.))/star.core_pressure
-        temperature = math.exp(term1*utilities.gravitational_constant*term2*mass**(2./3.) \
-                    - math.log(star.core_temp))
+        if test:
+            print "Convective"
+        term1 = -(math.pi/6)**(1./3)
+        term2 = (utilities.del_adiabatic*core_density**(4/3.))/star.core_pressure
+        temperature = math.exp(term1*utilities.gravitational_constant*term2*mass**(2./3.)) + star.core_temp
     else:
-        # if not convective, then radiative
-        term1 = -1./(2.*utilities.radiation_density_constant*utilities.speed_of_light)
+        if test:
+            print "Radiative"
+        term1 = -1/(2*utilities.radiation_density_constant*utilities.speed_of_light)
         term2 = (3/(4*math.pi))**(2./3.)
-        term3 = core_opacity*(e_n)*core_density**(4./3.)
-        term4 = mass**(2./3.)
-        temperature = (star.core_temp**4 - term1*term2*term3*term4)**(1./4.)
+        term3 = (core_opacity*e_n*core_density)**(4./3.)
+        temperature = (term1*term2*term3*mass*(2./3.))**(1./4.) + star.core_temp
 
     radius = (3./(4.*math.pi*core_density))**(1./3.) * mass**(1./3.)
+
+    if test:
+        print "Core Density: ", core_density
+        print "Core luminosity: ", core_luminosity
+        print "Core opacity: ", core_opacity
+        print [pressure, temperature, radius, core_luminosity]
+
 
     return [pressure, temperature, radius, core_luminosity]
 
@@ -95,44 +109,59 @@ def inward_start(star, test=True):
 
     return [surface_pressure, star.teff, star.total_radius, star.total_lum]
 
-def derivatives(layer, enclosed_mass, star):
+def derivatives(layer, enclosed_mass, star, test=True):
     """
     The enclosed_mass given should be the enclosed enclosed_mass, deal with that
     outside the function.
     """
-    print layer[1]
     density = calc_density.density_is(math.log10(layer[1]), math.log10(layer[0]), star.hydrogen_mass, star.helium_mass)
     opacity = 10**opacity_interpolation.opacity_is(math.log10(layer[1]), math.log10(density))
 
-    dpressure_dm = -((utilities.gravitational_constant)/(4*math.pi))*((enclosed_mass)/(layer[2]**4))
-    dradius_dm = (1./(4.*math.pi))*(1./(density*layer[2]**2))
-    dluminoisty_dm = star.calc_e_n(density, layer[1])
+    dpressure = -((utilities.gravitational_constant)/(4*math.pi))*((enclosed_mass)/(layer[2]**4))
+    dradius = (1./(4.*math.pi))*(1./(density*layer[2]**2))
+    dluminosity = utilities.calc_e_n(star, density, layer[1])
 
     del_rad = star.calc_del_rad(density, layer[0], layer[1], opacity, layer[3], enclosed_mass)
     if del_rad >= utilities.del_adiabatic:
-        dtemperature_dm = -((utilities.gravitational_constant*enclosed_mass*layer[1])/(4*math.pi*layer[0]))*utilities.del_adiabatic
+        if test:
+            print "Convective"
+        dtemperature = -((utilities.gravitational_constant*enclosed_mass*layer[1])/(4*math.pi*layer[0]*layer[2]**4))*utilities.del_adiabatic
     else:
-        dtemperature_dm = -((utilities.gravitational_constant*enclosed_mass*layer[1])/(4*math.pi*layer[0]))*del_rad
+        if test:
+            print "Radiative"
+        dtemperature = -((utilities.gravitational_constant*enclosed_mass*layer[1])/(4*math.pi*layer[0]*layer[2]**4))*del_rad
 
-    return [dpressure_dm, dtemperature_dm, dradius_dm, dluminoisty_dm]
+    if test:
+        print "Enclosed Mass: ", enclosed_mass
+        print "Density: ", density
+        print [dpressure, dtemperature, dradius, dluminosity], '\n'
+        print "Opacity: ", opacity
+    return [dpressure, dtemperature, dradius, dluminosity]
 
 
-def integrate(star, outward_masses, inward_masses, mass_initial):
+def integrate(star, inner_masses, outer_masses, mass_initial):
     # Get outward and inward initial conditions
     outward_initial =  outward_start(star, mass_initial)
     inward_initial =  inward_start(star)
-    #
-    outward_function = odeint(derivatives, outward_initial, outward_masses, args=(star,))
-    # Something still funky going on with the temperature values for this
-    inward_function = odeint(derivatives, inward_initial, inward_masses, args=(star,))
 
-    # Make this plot better.
-    plt.plot(outward_masses, outward_function, lw=3, color='r', label="Outward Integration")
-    plt.plot(inward_masses, inward_function, lw=3, color='b', label="Inward Integration")
+    # Something still funky going on with the temperature values for this
+    outward_values = odeint(derivatives, outward_initial, inner_masses, args=(star,))
+    inward_values = odeint(derivatives, inward_initial, outer_masses, args=(star,))
+
+    plt.plot(inner_masses, outward_values[:,0], lw=2, color='b', label="Pressure")
+    plt.plot(inner_masses, outward_values[:,1], lw=2, color='r', label="Temperature")
+    plt.plot(inner_masses, outward_values[:,2], lw=2, color='g', label="Radius")
+    plt.plot(inner_masses, outward_values[:,3], lw=2, color='k', label="Luminosity")
+    plt.plot(outer_masses, inward_values[:,0], lw=2, color='b', ls = '-')
+    plt.plot(outer_masses, inward_values[:,1], lw=2, color='r', ls = '-')
+    plt.plot(outer_masses, inward_values[:,2], lw=2, color='g', ls = '-')
+    plt.plot(outer_masses, inward_values[:,3], lw=2, color='k', ls = '-')
+    plt.xscale('log')
+    plt.yscale('log')
     plt.legend()
     plt.show()
-    sys.exit()
-    return score_is()
+
+    return difference_is(outward_values, inward_values)
 
 """
 Making testing suite.
@@ -142,5 +171,3 @@ if __file__ == sys.argv[0]:
     surface =  inward_start(star)
     print derivatives(star, core, mass_initial)
     print derivatives(star, surface, total_mass)
-
-    # test on on multiple sets of stars (once I make star object)...abuse these functions

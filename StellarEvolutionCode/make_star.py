@@ -53,26 +53,58 @@ class star(object):
         term2 = (opacity*luminosity*pressure)/(mass*temperature**4)
         return term1*term2
 
+def generate_inputs():
+    return 0
+
+def get_structure(star, inner_masses, outer_masses, mass_step):
+    """
+    Need to run the re-do the integration until convergence is reached
+    i.e. when the difference is zero.
+
+    After the first integration, use Newton's Method to generate new
+    initial guesses to give to shootf.
+    """
+    difference = shootf.integrate(star, inner_masses, outer_masses, mass_step)
+    #difference = 1
+    #while difference > 0:
+    #    difference = shootf.integrate(star, inner_masses, outer_masses, mass_step)
+    #    print difference
+    #    sys.exit()
+
+# All values for a two solar mass star
+solar_2x = star(1.6032636e17, 20.47409576e6, 15.51844053*(3.846e33), 1.66086519*(7e10),  2*(1.98e33), 0.70, 0.28)
+solar_2x.teff = solar_2x.calc_teff()
+mass_step = 1e-5 * solar_2x.total_mass
+
+fitting_point = solar_2x.total_mass*0.5
+inner_masses = np.linspace(mass_step, fitting_point, num=100)
+
+#99-100% of mass very fine steps, 1e-8
+blah1 = solar_2x.total_mass*0.99
+blah2 = solar_2x.total_mass*0.80
+outer_masses_1 = np.logspace(math.log10(solar_2x.total_mass),  math.log10(blah1), 1000)
+outer_masses_2 = np.logspace(math.log10(blah1),  math.log10(blah2), 1000)
+outer_masses_3 = np.logspace(math.log10(blah2),  math.log10(fitting_point), 1000)
+outer_masses = np.concatenate((outer_masses_1, outer_masses_2, outer_masses_3), axis=0)
+
+get_structure(solar_2x, inner_masses, outer_masses, mass_step)
+
+
 # All values for the Sun
 solar = star(2.526e14, 1.57e7, 3.846e33, 7e10, 1.98e33, 0.70, 0.28)
 solar.teff = solar.calc_teff()
-mass_step = 1e-8 * solar.total_mass
+mass_step = 1e-5 * solar.total_mass
 
-fitting_point = solar.total_mass*0.8
-inner_masses = np.logspace(math.log10(mass_step), math.log10(fitting_point))
-outer_masses = np.logspace(math.log10(solar.total_mass),  math.log10(fitting_point), 10e2)
+fitting_point = solar.total_mass*0.5
+inner_masses = np.linspace(mass_step, fitting_point, num=100)
 
-print shootf.integrate(solar, inner_masses, outer_masses, mass_step)
+#99-100% of mass very fine steps, 1e-8
+blah1 = solar.total_mass*0.99
+blah2 = solar.total_mass*0.80
+outer_masses_1 = np.logspace(math.log10(solar.total_mass),  math.log10(blah1), 1000)
+outer_masses_2 = np.logspace(math.log10(blah1),  math.log10(blah2), 1000)
+outer_masses_3 = np.logspace(math.log10(blah2),  math.log10(fitting_point), 1000)
+outer_masses = np.concatenate((outer_masses_1, outer_masses_2, outer_masses_3), axis=0)
 
-# func, x0, fprime
-#newton()
-
-def newt():
-    """
-    Use Newton's Method to adjust iniital conditions until we
-    can get score to go to zero.
-
-    This function controls the calls to shootf.
-    """
-    return 1
+#get_structure(solar, inner_masses, outer_masses, mass_step)
 
