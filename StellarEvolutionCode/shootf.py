@@ -4,6 +4,7 @@ import sys
 import math
 import numpy as np
 from scipy.integrate import odeint
+from scipy.optimize import newton_krylov
 import matplotlib.pyplot as plt
 import opacity_interpolation
 import calc_density
@@ -134,8 +135,8 @@ def derivatives(layer, enclosed_mass, star, test=True):
     if test:
         print "Enclosed Mass: ", enclosed_mass
         print "Density: ", density
-        print [dpressure, dtemperature, dradius, dluminosity], '\n'
         print "Opacity: ", opacity
+        print [dpressure, dtemperature, dradius, dluminosity], '\n'
     return [dpressure, dtemperature, dradius, dluminosity]
 
 
@@ -143,6 +144,11 @@ def integrate(star, inner_masses, outer_masses, mass_initial):
     # Get outward and inward initial conditions
     outward_initial =  outward_start(star, mass_initial)
     inward_initial =  inward_start(star)
+
+    inverse_jacobian =  utilities.compute_jacobian(outward_initial, mass_initial, star.core_pressure)
+    new_guesses = outward_initial - np.dot(inverse_jacobian, derivatives(outward_initial, mass_initial, star))
+    print outward_initial - new_guesses
+    sys.exit()
 
     # Something still funky going on with the temperature values for this
     outward_values = odeint(derivatives, outward_initial, inner_masses, args=(star,))

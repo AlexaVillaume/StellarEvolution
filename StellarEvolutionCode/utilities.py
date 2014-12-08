@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 """
 Constants:
@@ -11,6 +12,41 @@ mass_of_hydrogen           = 1.673e-24     # cgs
 del_adiabatic              = 0.4
 boltzmann_constant         = 1.38e-16      # ergs K^-1
 gas_constant               = 8.32e7        # K^-1 mol^-1
+
+
+"""
+The Jacobian of the equations in derivs.
+"""
+def func1(initial_guess, mass):
+    energy_transport = del_adiabatic
+    return ((gravitational_constant*mass*initial_guess[1])/(4*math.pi*(initial_guess[2]**4)*initial_guess[0]**2))*energy_transport
+
+def func2(initial_guess, mass):
+    energy_transport = del_adiabatic
+    return ((gravitational_constant*mass)/(4.*math.pi*(initial_guess[2]**4)*initial_guess[0]**2))*energy_transport
+
+def func3(initial_guess, mass):
+    energy_transport = del_adiabatic
+    return -(gravitational_constant*mass)/(initial_guess[2]**5)
+
+def func4(initial_guess, mass):
+    energy_transport = del_adiabatic
+    return ((gravitational_constant*mass*initial_guess[1])/(4.*math.pi*(initial_guess[2]**5)*initial_guess[0]))*energy_transport
+
+def func5(initial_guess, density):
+    energy_transport = del_adiabatic
+    return -(1.)/(2*math.pi*(initial_guess[2]**3)*density)
+
+def compute_jacobian(inital_guess, mass, density):
+    f1 = func1(inital_guess, mass)
+    f2 = func2(inital_guess, mass)
+    f3 = func3(inital_guess, mass)
+    f4 = func4(inital_guess, mass)
+    f5 = func5(inital_guess, density)
+
+    #jacobian = np.matrix([[0, f1, 0, 0], [0, f2, 0, 0], [f3, f4, f5, 0], [0, 0, 0, 0]])
+    jacobian = np.matrix([[2,3,1,5], [1,0,3,1], [0,2,-3,2], [0,2,3,1]])
+    return np.linalg.inv(jacobian)
 
 """
 Functions:
