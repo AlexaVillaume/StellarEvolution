@@ -64,12 +64,19 @@ def get_structure(star, inner_masses, outer_masses, mass_step):
     After the first integration, use Newton's Method to generate new
     initial guesses to give to shootf.
     """
-    difference = shootf.integrate(star, inner_masses, outer_masses, mass_step)
-    #difference = 1
-    #while difference > 0:
-    #    difference = shootf.integrate(star, inner_masses, outer_masses, mass_step)
-    #    print difference
-    #    sys.exit()
+    # Get outward and inward initial conditions
+    outward_initial =  shootf.outward_start(star, mass_initial)
+    inward_initial =  shootf.inward_start(star)
+
+    difference = 1
+    while difference > 0:
+        out_inv_jac =  utilities.compute_jacobian(outward_initial, mass_initial, star.core_pressure)
+        in_inv_jac =  utilities.compute_jacobian(inward_initial, mass_initial, star.core_pressure)
+        outward_initial = outward_initial - np.dot(out_inv_jac, shootf.derivatives(outward_initial, mass_initial, star))
+        inward_initial = inward_initial - np.dot(in_inv_jac, shootf.derivatives(inward_initial, star.total_mass, star))
+        difference = shootf.integrate(star, inner_masses, outer_masses, mass_step, outward_initial, inward_initial)
+        print difference
+        sys.exit()
 
 # All values for a two solar mass star
 solar_2x = star(1.6032636e17, 20.47409576e6, 15.51844053*(3.846e33), 1.66086519*(7e10),  2*(1.98e33), 0.70, 0.28)
@@ -77,7 +84,7 @@ solar_2x.teff = solar_2x.calc_teff()
 mass_step = 1e-5 * solar_2x.total_mass
 
 fitting_point = solar_2x.total_mass*0.5
-inner_masses = np.linspace(mass_step, fitting_point, num=100)
+shootf.inner_masses = np.linspace(mass_step, fitting_point, num=100)
 
 #99-100% of mass very fine steps, 1e-8
 blah1 = solar_2x.total_mass*0.99

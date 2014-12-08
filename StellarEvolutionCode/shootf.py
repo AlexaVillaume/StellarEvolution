@@ -10,23 +10,6 @@ import opacity_interpolation
 import calc_density
 import utilities
 
-def percent_difference(value1, value2):
-    average = (math.fabs(value1) + math.fabs(value2))/2.
-    return math.fabs(value1 - value2) / average
-
-def difference_is(outward_values, inward_values):
-    """
-    Evaluate and the return the difference between the inward and
-    outward integration at the fitting point.
-    """
-    o_i = len(outward_values) - 1
-    i_i = len(inward_values) - 1
-    dpressure = percent_difference(outward_values[:,0][o_i], inward_values[:,0][i_i])
-    dtemperature = percent_difference(outward_values[:,1][o_i],  inward_values[:,1][i_i])
-    dradius = percent_difference(outward_values[:,2][o_i], inward_values[:,2][i_i])
-    dluminosity = percent_difference(outward_values[:,3][o_i], inward_values[:,3][i_i])
-    return (dpressure + dtemperature + dradius + dluminosity) /4.
-
 def outward_start(star, mass, test=True):
     """
     Computing the initial guesses for pressure and
@@ -139,38 +122,8 @@ def derivatives(layer, enclosed_mass, star, test=True):
         print [dpressure, dtemperature, dradius, dluminosity], '\n'
     return [dpressure, dtemperature, dradius, dluminosity]
 
-
-def integrate(star, inner_masses, outer_masses, mass_initial):
-    # Get outward and inward initial conditions
-    outward_initial =  outward_start(star, mass_initial)
-    inward_initial =  inward_start(star)
-
-    inverse_jacobian =  utilities.compute_jacobian(outward_initial, mass_initial, star.core_pressure)
-    new_guesses = outward_initial - np.dot(inverse_jacobian, derivatives(outward_initial, mass_initial, star))
-    print outward_initial - new_guesses
-    sys.exit()
-
-    # Something still funky going on with the temperature values for this
-    outward_values = odeint(derivatives, outward_initial, inner_masses, args=(star,))
-    inward_values = odeint(derivatives, inward_initial, outer_masses, args=(star,))
-
-    plt.plot(inner_masses, outward_values[:,0], lw=2, color='b', label="Pressure")
-    plt.plot(inner_masses, outward_values[:,1], lw=2, color='r', label="Temperature")
-    plt.plot(inner_masses, outward_values[:,2], lw=2, color='g', label="Radius")
-    plt.plot(inner_masses, outward_values[:,3], lw=2, color='k', label="Luminosity")
-    plt.plot(outer_masses, inward_values[:,0], lw=2, color='b', ls = '-')
-    plt.plot(outer_masses, inward_values[:,1], lw=2, color='r', ls = '-')
-    plt.plot(outer_masses, inward_values[:,2], lw=2, color='g', ls = '-')
-    plt.plot(outer_masses, inward_values[:,3], lw=2, color='k', ls = '-')
-    plt.xscale('log')
-    plt.yscale('log')
-    plt.legend()
-    plt.show()
-
-    return difference_is(outward_values, inward_values)
-
 """
-Making testing suite.
+Making testing suite. This now longer makes sense.
 """
 if __file__ == sys.argv[0]:
     core =  outward_start(star, mass_initial)
