@@ -10,7 +10,24 @@ import opacity_interpolation
 import calc_density
 import utilities
 
-def outward_start(star, mass, test=True):
+def percent_difference(value1, value2):
+    average = (math.fabs(value1) + math.fabs(value2))/2.
+    return math.fabs(value1 - value2) / average
+
+def difference_is(outward_values, inward_values):
+    """
+    Evaluate and the return the difference between the inward and
+    outward integration at the fitting point.
+    """
+    o_i = len(outward_values) - 1
+    i_i = len(inward_values) - 1
+    dpressure = percent_difference(outward_values[:,0][o_i], inward_values[:,0][i_i])
+    dtemperature = percent_difference(outward_values[:,1][o_i],  inward_values[:,1][i_i])
+    dradius = percent_difference(outward_values[:,2][o_i], inward_values[:,2][i_i])
+    dluminosity = percent_difference(outward_values[:,3][o_i], inward_values[:,3][i_i])
+    return (dpressure + dtemperature + dradius + dluminosity) /4.
+
+def outward_start(star, mass, test=False):
     """
     Computing the initial guesses for pressure and
     temperture at the core.
@@ -60,7 +77,7 @@ def outward_start(star, mass, test=True):
 
     return [pressure, temperature, radius, core_luminosity]
 
-def inward_start(star, test=True):
+def inward_start(star, test=False):
     """
     Computing the initial guesses at the surface.
 
@@ -93,7 +110,7 @@ def inward_start(star, test=True):
 
     return [surface_pressure, star.teff, star.total_radius, star.total_lum]
 
-def derivatives(layer, enclosed_mass, star, test=True):
+def derivatives(layer, enclosed_mass, star, test=False):
     """
     The enclosed_mass given should be the enclosed enclosed_mass, deal with that
     outside the function.
@@ -122,8 +139,40 @@ def derivatives(layer, enclosed_mass, star, test=True):
         print [dpressure, dtemperature, dradius, dluminosity], '\n'
     return [dpressure, dtemperature, dradius, dluminosity]
 
+
+def integrate(star, inner_masses, outer_masses, mass_initial, in_initial, out_initial):
+    print in_initial
+    print out_initial, '\n'
+    # Something still funky going on with the temperature values for this
+    outward_values = odeint(derivatives, out_initial, inner_masses, args=(star,))
+    inward_values = odeint(derivatives, in_initial, outer_masses, args=(star,))
+
+    plt.plot(inner_masses, outward_values[:,0], lw=2, color='b', label="Pressure")
+    plt.plot(inner_masses, outward_values[:,1], lw=2, color='r', label="Temperature")
+    plt.plot(inner_masses, outward_values[:,2], lw=2, color='g', label="Radius")
+    plt.plot(inner_masses, outward_values[:,3], lw=2, color='k', label="Luminosity")
+    plt.plot(outer_masses, inward_values[:,0], lw=2, color='b', ls = '-')
+    plt.plot(outer_masses, inward_values[:,1], lw=2, color='r', ls = '-')
+    plt.plot(outer_masses, inward_values[:,2], lw=2, color='g', ls = '-')
+    plt.plot(outer_masses, inward_values[:,3], lw=2, color='k', ls = '-')
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.legend()
+    plt.show()
+
+    if difference_is(outward_values, inward_values) > 0.001:
+        in_inv_jac =  utilities.compute_jacobian(in_initial, mass_initial, star.core_pressure)
+        out_inv_jac =  utilities.compute_jacobian(out_initial, mass_initial, star.core_pressure)
+        in_initial = in_initial - np.dot(in_inv_jac, derivatives(in_initial, star.total_mass, star))
+        out_initial = out_initial - np.dot(out_inv_jac, derivatives(out_initial, mass_initial, star))
+        in_initial =  list(np.array(in_initial).reshape(-1,))
+        out_initial =  list(np.array(out_initial).reshape(-1,))
+        integrate(star, inner_masses, outer_masses, mass_initial, in_initial, out_initial)
+    else:
+        return
+
 """
-Making testing suite. This now longer makes sense.
+Making testing suite.
 """
 if __file__ == sys.argv[0]:
     core =  outward_start(star, mass_initial)

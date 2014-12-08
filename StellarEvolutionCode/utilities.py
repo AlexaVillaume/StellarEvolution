@@ -46,30 +46,13 @@ def compute_jacobian(inital_guess, mass, density):
 
     #jacobian = np.matrix([[0, f1, 0, 0], [0, f2, 0, 0], [f3, f4, f5, 0], [0, 0, 0, 0]])
     # Just a matrix I know I can invert so I can test the iteration
-    jacobian = np.matrix([[2,3,1,5], [1,0,3,1], [0,2,-3,2], [0,2,3,1]])
+    jacobian = np.matrix([[1,0,0,0], [0,1,0,0], [0,0,1,0], [0,0,0,1]])
+    #jacobian = np.matrix([[2,3,1,5], [1,0,3,1], [0,2,-3,2], [0,2,3,1]])
     return np.linalg.inv(jacobian)
 
 """
 Functions:
 """
-def percent_difference(value1, value2):
-    average = (math.fabs(value1) + math.fabs(value2))/2.
-    return math.fabs(value1 - value2) / average
-
-def difference_is(outward_values, inward_values):
-    """
-    Evaluate and the return the difference between the inward and
-    outward integration at the fitting point.
-    """
-    o_i = len(outward_values) - 1
-    i_i = len(inward_values) - 1
-    dpressure = percent_difference(outward_values[:,0][o_i], inward_values[:,0][i_i])
-    dtemperature = percent_difference(outward_values[:,1][o_i],  inward_values[:,1][i_i])
-    dradius = percent_difference(outward_values[:,2][o_i], inward_values[:,2][i_i])
-    dluminosity = percent_difference(outward_values[:,3][o_i], inward_values[:,3][i_i])
-
-    return (dpressure + dtemperature + dradius + dluminosity) /4.
-
 def nond_temperature(temperature, power):
     """
     A function to non-dimesionlize temperature to be
@@ -92,26 +75,4 @@ def calc_e_n(self, density, temperature):
     cno_e_n = (8.24e25)*g_14_1*X_cno*self.hydrogen_mass*density*(t_9**(-2./3.))*math.exp(-15.231*(t_9**(-1./3.)) - (t_9/0.8)**2)
 
     return pp_e_n + cno_e_n
-
-def integrate(star, inner_masses, outer_masses, mass_initial, outward_initial, inward_initial):
-    """
-    The call to odeint.
-    """
-    outward_values = odeint(derivatives, outward_initial, inner_masses, args=(star,))
-    inward_values = odeint(derivatives, inward_initial, outer_masses, args=(star,))
-
-    plt.plot(inner_masses, outward_values[:,0], lw=2, color='b', label="Pressure")
-    plt.plot(inner_masses, outward_values[:,1], lw=2, color='r', label="Temperature")
-    plt.plot(inner_masses, outward_values[:,2], lw=2, color='g', label="Radius")
-    plt.plot(inner_masses, outward_values[:,3], lw=2, color='k', label="Luminosity")
-    plt.plot(outer_masses, inward_values[:,0], lw=2, color='b', ls = '-')
-    plt.plot(outer_masses, inward_values[:,1], lw=2, color='r', ls = '-')
-    plt.plot(outer_masses, inward_values[:,2], lw=2, color='g', ls = '-')
-    plt.plot(outer_masses, inward_values[:,3], lw=2, color='k', ls = '-')
-    plt.xscale('log')
-    plt.yscale('log')
-    plt.legend()
-    plt.show()
-
-    return difference_is(outward_values, inward_values)
 
