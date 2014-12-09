@@ -188,10 +188,6 @@ def compute_jacobian(star, differences, surface_guesses, core_guesses, core_mass
             new_differences = difference_is(odeint(derivatives, new_core, core_masses, args=(star,)), odeint(derivatives, new_surface, surface_masses, args=(star,)))
             jacobian[:,i] = np.asarray(((new_differences - differences)/(step_sizes[i]))).reshape(4,1)
 
-    #print jacobian
-    print np.linalg.matrix_rank(jacobian)
-    #print np.linalg.inv(jacobian)
-    #sys.exit()
     return np.linalg.inv(jacobian)
 
 
