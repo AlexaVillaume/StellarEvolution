@@ -56,7 +56,7 @@ class star(object):
 def generate_inputs():
     return 0
 
-def get_structure(star, inner_masses, outer_masses, mass_step):
+def get_structure(star, core_masses, surface_masses, mass_step):
     """
     Need to run the re-do the integration until convergence is reached
     i.e. when the difference is zero.
@@ -66,7 +66,7 @@ def get_structure(star, inner_masses, outer_masses, mass_step):
     """
     in_initial = shootf.inward_start(star)
     out_initial = shootf.outward_start(star, mass_step)
-    shootf.integrate(star, inner_masses, outer_masses, mass_step, in_initial, out_initial)
+    shootf.integrate(star, core_masses, surface_masses, mass_step, in_initial, out_initial)
 
 # All values for a two solar mass star
 solar_2x = star(1.6032636e17, 20.47409576e6, 15.51844053*(3.846e33), 1.66086519*(7e10),  2*(1.98e33), 0.70, 0.28)
@@ -74,17 +74,17 @@ solar_2x.teff = solar_2x.calc_teff()
 mass_step = 1e-5 * solar_2x.total_mass
 
 fitting_point = solar_2x.total_mass*0.2
-inner_masses = np.linspace(mass_step, fitting_point, num=100)
+core_masses = np.linspace(mass_step, fitting_point, num=100)
 
 #99-100% of mass very fine steps, 1e-8
 blah1 = solar_2x.total_mass*0.99
 blah2 = solar_2x.total_mass*0.80
-outer_masses_1 = np.logspace(math.log10(solar_2x.total_mass),  math.log10(blah1), 1000)
-outer_masses_2 = np.logspace(math.log10(blah1),  math.log10(blah2), 1000)
-outer_masses_3 = np.logspace(math.log10(blah2),  math.log10(fitting_point), 1000)
-outer_masses = np.concatenate((outer_masses_1, outer_masses_2, outer_masses_3), axis=0)
+surface_masses_1 = np.logspace(math.log10(solar_2x.total_mass),  math.log10(blah1), 1000)
+surface_masses_2 = np.logspace(math.log10(blah1),  math.log10(blah2), 1000)
+surface_masses_3 = np.logspace(math.log10(blah2),  math.log10(fitting_point), 1000)
+surface_masses = np.concatenate((surface_masses_1, surface_masses_2, surface_masses_3), axis=0)
 
-get_structure(solar_2x, inner_masses, outer_masses, mass_step)
+get_structure(solar_2x, core_masses, surface_masses, mass_step)
 
 sys.exit()
 # All values for the Sun
@@ -93,15 +93,15 @@ solar.teff = solar.calc_teff()
 mass_step = 1e-5 * solar.total_mass
 
 fitting_point = solar.total_mass*0.5
-inner_masses = np.linspace(mass_step, fitting_point, num=100)
+core_masses = np.linspace(mass_step, fitting_point, num=100)
 
 #99-100% of mass very fine steps, 1e-8
 blah1 = solar.total_mass*0.99
 blah2 = solar.total_mass*0.80
-outer_masses_1 = np.logspace(math.log10(solar.total_mass),  math.log10(blah1), 1000)
-outer_masses_2 = np.logspace(math.log10(blah1),  math.log10(blah2), 1000)
-outer_masses_3 = np.logspace(math.log10(blah2),  math.log10(fitting_point), 1000)
-outer_masses = np.concatenate((outer_masses_1, outer_masses_2, outer_masses_3), axis=0)
+surface_masses_1 = np.logspace(math.log10(solar.total_mass),  math.log10(blah1), 1000)
+surface_masses_2 = np.logspace(math.log10(blah1),  math.log10(blah2), 1000)
+surface_masses_3 = np.logspace(math.log10(blah2),  math.log10(fitting_point), 1000)
+surface_masses = np.concatenate((surface_masses_1, surface_masses_2, surface_masses_3), axis=0)
 
-#get_structure(solar, inner_masses, outer_masses, mass_step)
+#get_structure(solar, core_masses, surface_masses, mass_step)
 
