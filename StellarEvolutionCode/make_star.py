@@ -64,9 +64,9 @@ def get_structure(star, core_masses, surface_masses, mass_step):
     After the first integration, use Newton's Method to generate new
     initial guesses to give to shootf.
     """
-    in_initial = shootf.inward_start(star)
-    out_initial = shootf.outward_start(star, mass_step)
-    shootf.integrate(star, core_masses, surface_masses, mass_step, in_initial, out_initial)
+    surface_initial = shootf.inward_start(star)
+    core_initial = shootf.outward_start(star, mass_step)
+    shootf.integrate(star, core_masses, surface_masses, mass_step, surface_initial, core_initial)
 
 # All values for a two solar mass star
 solar_2x = star(1.6032636e17, 20.47409576e6, 15.51844053*(3.846e33), 1.66086519*(7e10),  2*(1.98e33), 0.70, 0.28)
