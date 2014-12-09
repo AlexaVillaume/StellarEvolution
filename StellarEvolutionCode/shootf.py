@@ -21,10 +21,10 @@ def difference_is(core_values, surface_values):
     """
     o_i = len(core_values) - 1
     i_i = len(surface_values) - 1
-    dpressure = core_values[:,0][o_i] - surface_values[:,0][i_i]
-    dtemperature = core_values[:,1][o_i] - surface_values[:,1][i_i]
-    dradius = core_values[:,2][o_i] - surface_values[:,2][i_i]
-    dluminosity = core_values[:,3][o_i] - surface_values[:,3][i_i]
+    dpressure = (core_values[:,0][o_i] - surface_values[:,0][i_i])
+    dtemperature = (core_values[:,1][o_i] - surface_values[:,1][i_i])
+    dradius = (core_values[:,2][o_i] - surface_values[:,2][i_i])
+    dluminosity = (core_values[:,3][o_i] - surface_values[:,3][i_i])
     return np.array([dpressure, dtemperature, dradius, dluminosity])
 
 def outward_start(star, mass, test=False):
@@ -159,38 +159,39 @@ def compute_jacobian(star, differences, surface_guesses, core_guesses, core_mass
         if i == 0:
             pressure = star.core_pressure
             star.core_pressure = guesses[i]
-            new_in = inward_start(star)
-            new_out = outward_start(star, mass_step)
-            new_differences = difference_is(odeint(derivatives, new_out, core_masses, args=(star,)), odeint(derivatives, new_in, surface_masses, args=(star,)))
+            new_surface = inward_start(star)
+            new_core = outward_start(star, mass_step)
+            new_differences = difference_is(odeint(derivatives, new_core, core_masses, args=(star,)), odeint(derivatives, new_surface, surface_masses, args=(star,)))
             jacobian[:,i] = np.asarray(((new_differences - differences)/(step_sizes[i]))).reshape(4,1)
         if i == 1:
             temperature = star.core_temp
             star.core_pressure = pressure
             star.core_temp = guesses[i]
-            new_in = inward_start(star)
-            new_out = outward_start(star, mass_step)
-            new_differences = difference_is(odeint(derivatives, new_out, core_masses, args=(star,)), odeint(derivatives, new_in, surface_masses, args=(star,)))
+            star.core_temperature = temperature
+            new_surface = inward_start(star)
+            new_core = outward_start(star, mass_step)
+            new_differences = difference_is(odeint(derivatives, new_core, core_masses, args=(star,)), odeint(derivatives, new_surface, surface_masses, args=(star,)))
             jacobian[:,i] = np.asarray(((new_differences - differences)/(step_sizes[i]))).reshape(4,1)
         if i == 2:
             radius = star.total_radius
             star.core_temperature = temperature
             star.total_radius = guesses[i]
-            new_in = inward_start(star)
-            new_out = outward_start(star, mass_step)
-            new_differences = difference_is(odeint(derivatives, new_out, core_masses, args=(star,)), odeint(derivatives, new_in, surface_masses, args=(star,)))
+            new_surface = inward_start(star)
+            new_core = outward_start(star, mass_step)
+            new_differences = difference_is(odeint(derivatives, new_core, core_masses, args=(star,)), odeint(derivatives, new_surface, surface_masses, args=(star,)))
             jacobian[:,i] = np.asarray(((new_differences - differences)/(step_sizes[i]))).reshape(4,1)
         if i == 3:
             star.total_radius = radius
-            luminoisty = star.total_lum
             star.total_lum = guesses[i]
-            new_in = inward_start(star)
-            new_out = outward_start(star, mass_step)
-            new_differences = difference_is(odeint(derivatives, new_out, core_masses, args=(star,)), odeint(derivatives, new_in, surface_masses, args=(star,)))
+            new_surface = inward_start(star)
+            new_core = outward_start(star, mass_step)
+            new_differences = difference_is(odeint(derivatives, new_core, core_masses, args=(star,)), odeint(derivatives, new_surface, surface_masses, args=(star,)))
             jacobian[:,i] = np.asarray(((new_differences - differences)/(step_sizes[i]))).reshape(4,1)
 
-    print jacobian
-    print np.linalg.inv(jacobian)
-    sys.exit()
+    #print jacobian
+    print np.linalg.matrix_rank(jacobian)
+    #print np.linalg.inv(jacobian)
+    #sys.exit()
     return np.linalg.inv(jacobian)
 
 
@@ -224,7 +225,7 @@ def integrate(star, core_masses, surface_masses, mass_initial, surface_initial, 
         print surface_initial
         print core_initial, '\n'
 
-        sys.exit()
+        #sys.exit()
         # Kind of sloppy but need to do this for the new values to work as input
         surface_initial =  list(np.array(surface_initial).reshape(-1,))
         core_initial =  list(np.array(core_initial).reshape(-1,))
