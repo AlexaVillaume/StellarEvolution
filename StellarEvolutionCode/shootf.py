@@ -164,9 +164,10 @@ def compute_jacobian(star, differences, surface_guesses, core_guesses, core_mass
         if i == 3:
             guess_star.total_lum = new_guess
 
-        new_surface = inward_start(star)
-        new_core = outward_start(star, mass_step)
-        new_differences = difference_is(odeint(derivatives, new_core, core_masses, args=(star,)), odeint(derivatives, new_surface, surface_masses, args=(star,)))
+        new_surface = inward_start(guess_star)
+        new_core = outward_start(guess_star, mass_step)
+        new_differences = difference_is(odeint(derivatives, new_core, core_masses, args=(guess_star,)), odeint(derivatives, new_surface,
+            surface_masses, args=(guess_star,)))
         jacobian[:,i] = np.asarray(((new_differences - differences)/(step_sizes[i]))).reshape(4,1)
     return np.linalg.inv(jacobian)
 
