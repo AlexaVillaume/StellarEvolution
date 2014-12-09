@@ -142,27 +142,22 @@ def derivatives(layer, enclosed_mass, star, test=False):
 def compute_jacobian(star, differences, surface_guesses, core_guesses, core_masses, surface_masses, mass_step):
     jacobian = np.matrix(np.zeros((4,4)))
 
-    # Make one array of the independent boundary conditions core pressure, core temperature, surface radius, and surface luminosity
-    guesses = np.array((core_guesses[0],core_guesses[1], surface_guesses[2], surface_guesses[3]))
-    step_sizes = 0.01*guesses
-
     # Vary the initial guesses one at a time, run odeint, fill in the appr.
     # column of the jacobian, do for every value
     # temperature and pressure change the core condtions
     # radius and luminosity change the surface conditions
-    for i in range(len(guesses)):
+    for i in range(0:4):
         guess_star = star.copy()
-        new_guess = guesses[i] + step_sizes[i]
         # need to update star and then call odeint again
         # But I don't want these values to presist after this
         if i == 0:
-            guess_star.core_pressure = new_guess
+            guess_star.core_pressure = core_guesses[0] + core_guesses[0]*0.01
         if i == 1:
-            guess_star.core_temp = new_guess
+            guess_star.core_temp = core_guesses[1] + core_guesses[1]*0.01
         if i == 2:
-            guess_star.total_radius = new_guess
+            guess_star.total_radius = surface_guesses[2] + surface_guesses[2]*0.01
         if i == 3:
-            guess_star.total_lum = new_guess
+            guess_star.total_lum = surface_guesses[2] + surface_guesses[2]*0.01
 
         new_surface = inward_start(guess_star)
         new_core = outward_start(guess_star, mass_step)
