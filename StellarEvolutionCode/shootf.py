@@ -172,7 +172,6 @@ def compute_jacobian(star, differences, surface_guesses, core_guesses, core_mass
         if i == 3:
             star.total_radius = radius
             star.total_lum = new_guess[i]
-            jacobian[:,i] = np.asarray(((new_differences - differences)/(step_sizes[i]))).reshape(4,1)
 
         new_surface = inward_start(star)
         new_core = outward_start(star, mass_step)
