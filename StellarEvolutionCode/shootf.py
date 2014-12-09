@@ -151,6 +151,7 @@ def compute_jacobian(star, differences, surface_guesses, core_guesses, core_mass
     # temperature and pressure change the core condtions
     # radius and luminosity change the surface conditions
     for i in range(len(guesses)):
+        guess_star = star.copy()
         tmp = guesses[i] + step_sizes[i]
         new_guess = guesses.copy()
         new_guess[i] = tmp
@@ -158,36 +159,25 @@ def compute_jacobian(star, differences, surface_guesses, core_guesses, core_mass
         # But I don't want these values to presist after this
         if i == 0:
             pressure = star.core_pressure
-            star.core_pressure = guesses[i]
-            new_surface = inward_start(star)
-            new_core = outward_start(star, mass_step)
-            new_differences = difference_is(odeint(derivatives, new_core, core_masses, args=(star,)), odeint(derivatives, new_surface, surface_masses, args=(star,)))
-            jacobian[:,i] = np.asarray(((new_differences - differences)/(step_sizes[i]))).reshape(4,1)
+            star.core_pressure = new_guess[i]
         if i == 1:
             temperature = star.core_temp
             star.core_pressure = pressure
-            star.core_temp = guesses[i]
+            star.core_temp = new_guess[i]
             star.core_temperature = temperature
-            new_surface = inward_start(star)
-            new_core = outward_start(star, mass_step)
-            new_differences = difference_is(odeint(derivatives, new_core, core_masses, args=(star,)), odeint(derivatives, new_surface, surface_masses, args=(star,)))
-            jacobian[:,i] = np.asarray(((new_differences - differences)/(step_sizes[i]))).reshape(4,1)
         if i == 2:
             radius = star.total_radius
             star.core_temperature = temperature
-            star.total_radius = guesses[i]
-            new_surface = inward_start(star)
-            new_core = outward_start(star, mass_step)
-            new_differences = difference_is(odeint(derivatives, new_core, core_masses, args=(star,)), odeint(derivatives, new_surface, surface_masses, args=(star,)))
-            jacobian[:,i] = np.asarray(((new_differences - differences)/(step_sizes[i]))).reshape(4,1)
+            star.total_radius = new_guess[i]
         if i == 3:
             star.total_radius = radius
-            star.total_lum = guesses[i]
-            new_surface = inward_start(star)
-            new_core = outward_start(star, mass_step)
-            new_differences = difference_is(odeint(derivatives, new_core, core_masses, args=(star,)), odeint(derivatives, new_surface, surface_masses, args=(star,)))
+            star.total_lum = new_guess[i]
             jacobian[:,i] = np.asarray(((new_differences - differences)/(step_sizes[i]))).reshape(4,1)
 
+        new_surface = inward_start(star)
+        new_core = outward_start(star, mass_step)
+        new_differences = difference_is(odeint(derivatives, new_core, core_masses, args=(star,)), odeint(derivatives, new_surface, surface_masses, args=(star,)))
+        jacobian[:,i] = np.asarray(((new_differences - differences)/(step_sizes[i]))).reshape(4,1)
     return np.linalg.inv(jacobian)
 
 
