@@ -152,26 +152,17 @@ def compute_jacobian(star, differences, surface_guesses, core_guesses, core_mass
     # radius and luminosity change the surface conditions
     for i in range(len(guesses)):
         guess_star = star.copy()
-        tmp = guesses[i] + step_sizes[i]
-        new_guess = guesses.copy()
-        new_guess[i] = tmp
+        new_guess = guesses[i] + step_sizes[i]
         # need to update star and then call odeint again
         # But I don't want these values to presist after this
         if i == 0:
-            pressure = star.core_pressure
-            star.core_pressure = new_guess[i]
+            guess_star.core_pressure = new_guess
         if i == 1:
-            temperature = star.core_temp
-            star.core_pressure = pressure
-            star.core_temp = new_guess[i]
-            star.core_temperature = temperature
+            guess_star.core_temp = new_guess
         if i == 2:
-            radius = star.total_radius
-            star.core_temperature = temperature
-            star.total_radius = new_guess[i]
+            guess_star.total_radius = new_guess
         if i == 3:
-            star.total_radius = radius
-            star.total_lum = new_guess[i]
+            guess_star.total_lum = new_guess
 
         new_surface = inward_start(star)
         new_core = outward_start(star, mass_step)
