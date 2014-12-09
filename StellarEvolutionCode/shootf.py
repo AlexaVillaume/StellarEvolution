@@ -146,7 +146,7 @@ def compute_jacobian(star, differences, surface_guesses, core_guesses, core_mass
     # column of the jacobian, do for every value
     # temperature and pressure change the core condtions
     # radius and luminosity change the surface conditions
-    for i in range(0:4):
+    for i in range(0,4):
         guess_star = star.copy()
         # need to update star and then call odeint again
         # But I don't want these values to presist after this
