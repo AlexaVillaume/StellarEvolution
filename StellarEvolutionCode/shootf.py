@@ -15,6 +15,22 @@ def percent_difference(value1, value2):
     average = (math.fabs(value1) + math.fabs(value2))/2.
     return math.fabs(value1 - value2) / average
 
+def percent_difference(core_values, surface_values):
+    """
+    Evaluate and the return the difference between the inward and
+    core integration at the fitting point.
+    """
+    o_i = len(core_values) - 1
+    i_i = len(surface_values) - 1
+
+    dpressure = (core_values[:,0][o_i] - surface_values[:,0][i_i]) / np.average([core_values[:,0][o_i],  surface_values[:,0][i_i]])
+    dtemperature = (core_values[:,1][o_i] - surface_values[:,1][i_i]) / np.average([core_values[:,1][o_i], surface_values[:,1][i_i]])
+    dradius = (core_values[:,2][o_i] - surface_values[:,2][i_i])  / np.average([core_values[:,2][o_i],  surface_values[:,2][i_i]])
+    dluminosity = (core_values[:,3][o_i] - surface_values[:,3][i_i]) / np.average([core_values[:,3][o_i],  surface_values[:,3][i_i]])
+
+    return np.average([dpressure, dtemperature, dradius, dluminosity])
+
+
 def difference_is(core_values, surface_values):
     """
     Evaluate and the return the difference between the inward and
@@ -26,6 +42,7 @@ def difference_is(core_values, surface_values):
     dtemperature = (core_values[:,1][o_i] - surface_values[:,1][i_i])
     dradius = (core_values[:,2][o_i] - surface_values[:,2][i_i])
     dluminosity = (core_values[:,3][o_i] - surface_values[:,3][i_i])
+
     return np.array([dpressure, dtemperature, dradius, dluminosity])
 
 def outward_start(star, mass, test=False):
@@ -191,22 +208,19 @@ def integrate(star, core_masses, surface_masses, mass_initial, surface_initial, 
 
     differences = difference_is(core_values, surface_values)
     print "Differences: ", differences
-    if np.average(differences) > 0.001:
+    if percent_difference(core_values, surface_values) > 0.001:
         inv_jac =  compute_jacobian(star, differences, surface_initial, core_initial, core_masses, surface_masses, mass_initial)
-        surface_initial = surface_initial - (np.dot(inv_jac, differences))*0.01
-        core_initial = core_initial - (np.dot(inv_jac, differences))*0.01
+        surface_initial = surface_initial - (np.dot(inv_jac, differences))*0.005
+        core_initial = core_initial - (np.dot(inv_jac, differences))*0.005
 
-        print surface_initial
-        print core_initial, '\n'
-
-        #sys.exit()
         # Kind of sloppy but need to do this for the new values to work as input
         surface_initial =  list(np.array(surface_initial).reshape(-1,))
         core_initial =  list(np.array(core_initial).reshape(-1,))
         integrate(star, core_masses, surface_masses, mass_initial, surface_initial, core_initial)
     else:
         # Also want to write out the logs
-        return 0
+        print "yay!"
+
 """
 Making testing suite.
 """
