@@ -157,7 +157,7 @@ def compute_jacobian(star, differences, surface_guesses, core_guesses, core_mass
         if i == 2:
             guess_star.total_radius = surface_guesses[2] + surface_guesses[2]*0.01
         if i == 3:
-            guess_star.total_lum = surface_guesses[2] + surface_guesses[2]*0.01
+            guess_star.total_lum = surface_guesses[3] + surface_guesses[3]*0.01
 
         new_surface = inward_start(guess_star)
         new_core = outward_start(guess_star, mass_step)
