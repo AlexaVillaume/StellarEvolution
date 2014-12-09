@@ -73,7 +73,7 @@ solar_2x = star(1.6032636e17, 20.47409576e6, 15.51844053*(3.846e33), 1.66086519*
 solar_2x.teff = solar_2x.calc_teff()
 mass_step = 1e-5 * solar_2x.total_mass
 
-fitting_point = solar_2x.total_mass*0.5
+fitting_point = solar_2x.total_mass*0.2
 inner_masses = np.linspace(mass_step, fitting_point, num=100)
 
 #99-100% of mass very fine steps, 1e-8

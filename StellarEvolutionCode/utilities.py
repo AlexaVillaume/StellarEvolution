@@ -15,40 +15,18 @@ gas_constant               = 8.32e7        # K^-1 mol^-1
 
 
 """
-The Jacobian of the equations in derivs.
+Compute the Jacobian at the fitting point. Vary each initial guess while holding
+others constant, and compute partial derivatives in each case using foward
+difference approximation.
 """
-def func1(initial_guess, mass):
-    energy_transport = del_adiabatic
-    return ((gravitational_constant*mass*initial_guess[1])/(4*math.pi*(initial_guess[2]**4)*initial_guess[0]**2))*energy_transport
-
-def func2(initial_guess, mass):
-    energy_transport = del_adiabatic
-    return ((gravitational_constant*mass)/(4.*math.pi*(initial_guess[2]**4)*initial_guess[0]**2))*energy_transport
-
-def func3(initial_guess, mass):
-    energy_transport = del_adiabatic
-    return -(gravitational_constant*mass)/(initial_guess[2]**5)
-
-def func4(initial_guess, mass):
-    energy_transport = del_adiabatic
-    return ((gravitational_constant*mass*initial_guess[1])/(4.*math.pi*(initial_guess[2]**5)*initial_guess[0]))*energy_transport
-
-def func5(initial_guess, density):
-    energy_transport = del_adiabatic
-    return -(1.)/(2*math.pi*(initial_guess[2]**3)*density)
-
-def compute_jacobian(inital_guess, mass, density):
-    f1 = func1(inital_guess, mass)
-    f2 = func2(inital_guess, mass)
-    f3 = func3(inital_guess, mass)
-    f4 = func4(inital_guess, mass)
-    f5 = func5(inital_guess, density)
-
-    #jacobian = np.matrix([[0, f1, 0, 0], [0, f2, 0, 0], [f3, f4, f5, 0], [0, 0, 0, 0]])
-    # Just a matrix I know I can invert so I can test the iteration
-    jacobian = np.matrix([[1,0,0,0], [0,1,0,0], [0,0,1,0], [0,0,0,1]])
-    #jacobian = np.matrix([[2,3,1,5], [1,0,3,1], [0,2,-3,2], [0,2,3,1]])
-    return np.linalg.inv(jacobian)
+#def get_jacobian(initial_guess):
+#    jacobian = np.ndarray(shape=(4,4), dtype=float)
+#    for i, value in enumerate(initial_guess):
+#        h = 0.01*value # Change value by 1%
+#        tmp = value + h
+#        new_guess = guess
+#        new_guess[i] = tmp
+#        new = shootf.deriative(
 
 """
 Functions:
