@@ -6,6 +6,7 @@ import numpy as np
 from scipy.integrate import odeint
 from scipy.optimize import newton_krylov
 import matplotlib.pyplot as plt
+from copy import copy
 import opacity_interpolation
 import calc_density
 import utilities
@@ -142,28 +143,29 @@ def derivatives(layer, enclosed_mass, star, test=False):
 def compute_jacobian(star, differences, surface_guesses, core_guesses, core_masses, surface_masses, mass_step):
     jacobian = np.matrix(np.zeros((4,4)))
 
-    # Vary the initial guesses one at a time, run odeint, fill in the appr.
-    # column of the jacobian, do for every value
     # temperature and pressure change the core condtions
     # radius and luminosity change the surface conditions
     for i in range(0,4):
-        guess_star = star.copy()
-        # need to update star and then call odeint again
-        # But I don't want these values to presist after this
+        guess_star = copy(star)
         if i == 0:
-            guess_star.core_pressure = core_guesses[0] + core_guesses[0]*0.01
-        if i == 1:
-            guess_star.core_temp = core_guesses[1] + core_guesses[1]*0.01
-        if i == 2:
-            guess_star.total_radius = surface_guesses[2] + surface_guesses[2]*0.01
-        if i == 3:
-            guess_star.total_lum = surface_guesses[3] + surface_guesses[3]*0.01
+            step_size = core_guesses[0]*0.01
+            guess_star.core_pressure = core_guesses[0] + step_size
+        elif i == 1:
+            step_size = core_guesses[1]*0.01
+            guess_star.core_temp     = core_guesses[1] + step_size
+        elif i == 2:
+            step_size = surface_guesses[2]*0.01
+            guess_star.total_radius  = surface_guesses[2] + step_size
+        elif i == 3:
+            step_size = surface_guesses[3]*0.01
+            guess_star.total_lum     = surface_guesses[3] + step_size
 
         new_surface = inward_start(guess_star)
         new_core = outward_start(guess_star, mass_step)
         new_differences = difference_is(odeint(derivatives, new_core, core_masses, args=(guess_star,)), odeint(derivatives, new_surface,
             surface_masses, args=(guess_star,)))
-        jacobian[:,i] = np.asarray(((new_differences - differences)/(step_sizes[i]))).reshape(4,1)
+        jacobian[:,i] = np.asarray(((new_differences - differences)/(step_size))).reshape(4,1)
+
     return np.linalg.inv(jacobian)
 
 
