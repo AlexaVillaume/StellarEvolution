@@ -30,7 +30,6 @@ def percent_difference(core_values, surface_values):
 
     return np.average([dpressure, dtemperature, dradius, dluminosity])
 
-
 def difference_is(core_values, surface_values):
     """
     Evaluate and the return the difference between the inward and
@@ -44,6 +43,22 @@ def difference_is(core_values, surface_values):
     dluminosity = (core_values[:,3][o_i] - surface_values[:,3][i_i])
 
     return np.array([dpressure, dtemperature, dradius, dluminosity])
+
+
+def plot_models(core_masses, surface_masses, core_values, surface_values):
+    plt.plot(core_masses, core_values[:,0], lw=2, color='b', label="Pressure")
+    plt.plot(core_masses, core_values[:,1], lw=2, color='r', label="Temperature")
+    plt.plot(core_masses, core_values[:,2], lw=2, color='g', label="Radius")
+    plt.plot(core_masses, core_values[:,3], lw=2, color='k', label="Luminosity")
+    plt.plot(surface_masses, surface_values[:,0], lw=2, color='b', ls = '-')
+    plt.plot(surface_masses, surface_values[:,1], lw=2, color='r', ls = '-')
+    plt.plot(surface_masses, surface_values[:,2], lw=2, color='g', ls = '-')
+    plt.plot(surface_masses, surface_values[:,3], lw=2, color='k', ls = '-')
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.legend()
+    plt.show()
+
 
 def outward_start(star, mass, test=False):
     """
@@ -160,24 +175,18 @@ def derivatives(layer, enclosed_mass, star, test=False):
 def compute_jacobian(star, differences, surface_guesses, core_guesses, core_masses, surface_masses, mass_step):
     jacobian = np.matrix(np.zeros((4,4)))
 
-    # temperature and pressure change the core condtions
-    # radius and luminosity change the surface conditions
     for i in range(0,4):
         guess_star = copy(star)
         if i == 0:
-            print "PRESSURE"
             step_size = core_guesses[0]*0.01
             guess_star.core_pressure = core_guesses[0] + step_size
         elif i == 1:
-            print "TEMPERATURE"
             step_size = core_guesses[1]*0.01
             guess_star.core_temp     = core_guesses[1] + step_size
         elif i == 2:
-            print "RADIUS"
             step_size = surface_guesses[2]*0.01
             guess_star.total_radius  = surface_guesses[2] + step_size
         elif i == 3:
-            print "LUMINOISTY"
             step_size = surface_guesses[3]*0.01
             guess_star.total_lum     = surface_guesses[3] + step_size
 
@@ -197,36 +206,21 @@ def integrate(star, core_masses, surface_masses, mass_initial, surface_initial, 
     core_values = odeint(derivatives, core_initial, core_masses, args=(star,))
     surface_values = odeint(derivatives, surface_initial, surface_masses, args=(star,))
 
-    plt.plot(core_masses, core_values[:,0], lw=2, color='b', label="Pressure")
-    plt.plot(core_masses, core_values[:,1], lw=2, color='r', label="Temperature")
-    plt.plot(core_masses, core_values[:,2], lw=2, color='g', label="Radius")
-    plt.plot(core_masses, core_values[:,3], lw=2, color='k', label="Luminosity")
-    plt.plot(surface_masses, surface_values[:,0], lw=2, color='b', ls = '-')
-    plt.plot(surface_masses, surface_values[:,1], lw=2, color='r', ls = '-')
-    plt.plot(surface_masses, surface_values[:,2], lw=2, color='g', ls = '-')
-    plt.plot(surface_masses, surface_values[:,3], lw=2, color='k', ls = '-')
-    plt.xscale('log')
-    plt.yscale('log')
-    plt.legend()
-    plt.show()
-
     differences = difference_is(core_values, surface_values)
     print "Differences: ", differences
     print "Percent Difference: ", percent_difference(core_values, surface_values)
-    if percent_difference(core_values, surface_values) > 0.01:
+    if math.fabs(percent_difference(core_values, surface_values)) > 0.01:
         inv_jac =  compute_jacobian(star, differences, surface_initial, core_initial, core_masses, surface_masses, mass_initial)
         surface_initial = surface_initial - (np.dot(inv_jac, differences))*0.01
         core_initial = core_initial - (np.dot(inv_jac, differences))*0.01
 
-    #    print surface_initial
-    #    print core_initial, '\n'
-    #    sys.exit()
         #Kind of sloppy but need to do this for the new values to work as input
         surface_initial =  list(np.array(surface_initial).reshape(-1,))
         core_initial =  list(np.array(core_initial).reshape(-1,))
         integrate(star, core_masses, surface_masses, mass_initial, surface_initial, core_initial)
     else:
         # Also want to write out the logs
+        plot_models(core_masses, surface_masses, core_values, surface_values)
         print "yay!"
 
 """
