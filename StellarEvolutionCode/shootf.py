@@ -165,23 +165,27 @@ def compute_jacobian(star, differences, surface_guesses, core_guesses, core_mass
     for i in range(0,4):
         guess_star = copy(star)
         if i == 0:
+            print "PRESSURE"
             step_size = core_guesses[0]*0.01
             guess_star.core_pressure = core_guesses[0] + step_size
         elif i == 1:
+            print "TEMPERATURE"
             step_size = core_guesses[1]*0.01
             guess_star.core_temp     = core_guesses[1] + step_size
         elif i == 2:
+            print "RADIUS"
             step_size = surface_guesses[2]*0.01
             guess_star.total_radius  = surface_guesses[2] + step_size
         elif i == 3:
+            print "LUMINOISTY"
             step_size = surface_guesses[3]*0.01
             guess_star.total_lum     = surface_guesses[3] + step_size
 
         new_surface = inward_start(guess_star)
         new_core = outward_start(guess_star, mass_step)
-        new_differences = difference_is(odeint(derivatives, new_core, core_masses, args=(guess_star,)), odeint(derivatives, new_surface,
-            surface_masses, args=(guess_star,)))
-        jacobian[:,i] = np.asarray((new_differences - differences)/step_size).reshape(4,1)
+        new_differences = difference_is(odeint(derivatives, new_core, core_masses, args=(guess_star,)),
+                            odeint(derivatives, new_surface, surface_masses, args=(guess_star,)))
+        jacobian[:,i] = np.asarray((new_differences - differences)/0.1).reshape(4,1)
 
     return np.linalg.inv(jacobian)
 
@@ -208,12 +212,16 @@ def integrate(star, core_masses, surface_masses, mass_initial, surface_initial, 
 
     differences = difference_is(core_values, surface_values)
     print "Differences: ", differences
-    if percent_difference(core_values, surface_values) > 0.001:
+    print "Percent Difference: ", percent_difference(core_values, surface_values)
+    if percent_difference(core_values, surface_values) > 0.01:
         inv_jac =  compute_jacobian(star, differences, surface_initial, core_initial, core_masses, surface_masses, mass_initial)
-        surface_initial = surface_initial - (np.dot(inv_jac, differences))*0.005
-        core_initial = core_initial - (np.dot(inv_jac, differences))*0.005
+        surface_initial = surface_initial - (np.dot(inv_jac, differences))*0.01
+        core_initial = core_initial - (np.dot(inv_jac, differences))*0.01
 
-        # Kind of sloppy but need to do this for the new values to work as input
+    #    print surface_initial
+    #    print core_initial, '\n'
+    #    sys.exit()
+        #Kind of sloppy but need to do this for the new values to work as input
         surface_initial =  list(np.array(surface_initial).reshape(-1,))
         core_initial =  list(np.array(core_initial).reshape(-1,))
         integrate(star, core_masses, surface_masses, mass_initial, surface_initial, core_initial)
