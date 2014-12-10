@@ -173,7 +173,7 @@ def derivatives(layer, enclosed_mass, star, test=False):
     return [dpressure, dtemperature, dradius, dluminosity]
 
 def compute_jacobian(star, differences, surface_guesses, core_guesses, core_masses, surface_masses, mass_step):
-    jacobian = np.matrix(np.zeros((4,4)))
+    jacobian =(np.zeros((4,4)))
 
     for i in range(0,4):
         guess_star = copy(star)
@@ -192,9 +192,12 @@ def compute_jacobian(star, differences, surface_guesses, core_guesses, core_mass
 
         new_surface = inward_start(guess_star)
         new_core = outward_start(guess_star, mass_step)
+        surface_values =  odeint(derivatives, new_surface, surface_masses, args=(guess_star,))
+        core_values = odeint(derivatives, new_core, core_masses, args=(guess_star,))
+
         new_differences = difference_is(odeint(derivatives, new_core, core_masses, args=(guess_star,)),
                             odeint(derivatives, new_surface, surface_masses, args=(guess_star,)))
-        jacobian[:,i] = np.asarray((new_differences - differences)/0.1).reshape(4,1)
+        jacobian[:,i] = np.asarray((new_differences - differences)/step_size)
 
     return np.linalg.inv(jacobian)
 
@@ -202,21 +205,23 @@ def compute_jacobian(star, differences, surface_guesses, core_guesses, core_mass
 def integrate(star, core_masses, surface_masses, mass_initial, surface_initial, core_initial):
     print surface_initial
     print core_initial, '\n'
-    # Something still funky going on with the temperature values for this
     core_values = odeint(derivatives, core_initial, core_masses, args=(star,))
     surface_values = odeint(derivatives, surface_initial, surface_masses, args=(star,))
 
+    #plot_models(core_masses, surface_masses, core_values, surface_values)
     differences = difference_is(core_values, surface_values)
-    print "Differences: ", differences
     print "Percent Difference: ", percent_difference(core_values, surface_values)
+    #if math.fabs(percent_difference(core_values, surface_values)) > 0.005:
     if math.fabs(percent_difference(core_values, surface_values)) > 0.01:
         inv_jac =  compute_jacobian(star, differences, surface_initial, core_initial, core_masses, surface_masses, mass_initial)
-        surface_initial = surface_initial - (np.dot(inv_jac, differences))*0.01
-        core_initial = core_initial - (np.dot(inv_jac, differences))*0.01
 
-        #Kind of sloppy but need to do this for the new values to work as input
-        surface_initial =  list(np.array(surface_initial).reshape(-1,))
-        core_initial =  list(np.array(core_initial).reshape(-1,))
+        star.core_pressure = star.core_pressure + (np.dot(inv_jac, differences))[0]*0.01
+        star.core_temp = star.core_temp + (np.dot(inv_jac, differences))[1]*0.01
+        star.total_radius = star.total_radius + (np.dot(inv_jac, differences))[2]*0.01
+        star.total_lum = star.total_lum + (np.dot(inv_jac, differences))[3]*0.01
+
+        surface_initial = inward_start(star)
+        core_initial = outward_start(star, mass_initial)
         integrate(star, core_masses, surface_masses, mass_initial, surface_initial, core_initial)
     else:
         # Also want to write out the logs
