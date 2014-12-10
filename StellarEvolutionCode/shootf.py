@@ -215,13 +215,29 @@ def integrate(star, core_masses, surface_masses, mass_initial, surface_initial, 
     if math.fabs(percent_difference(core_values, surface_values)) > 0.01:
         inv_jac =  compute_jacobian(star, differences, surface_initial, core_initial, core_masses, surface_masses, mass_initial)
 
-        star.core_pressure = star.core_pressure + (np.dot(inv_jac, differences))[0]*0.01
-        star.core_temp = star.core_temp + (np.dot(inv_jac, differences))[1]*0.01
-        star.total_radius = star.total_radius + (np.dot(inv_jac, differences))[2]*0.01
-        star.total_lum = star.total_lum + (np.dot(inv_jac, differences))[3]*0.01
+        # Don't apply the correction directly to the old load1 and load2 initial conditions.
+        # apply to the array of independent variables, re-run load1 and load2 and then call odeint.
+
+
+        star.core_pressure = star.core_pressure - (np.dot(inv_jac, differences))[0]*0.01
+        star.core_temp = star.core_temp - (np.dot(inv_jac, differences))[1]*0.01
+        star.total_radius = star.total_radius - (np.dot(inv_jac, differences))[2]*0.01
+        star.total_lum = star.total_lum - (np.dot(inv_jac, differences))[3]*0.01
 
         surface_initial = inward_start(star)
         core_initial = outward_start(star, mass_initial)
+        #ind_variables = np.array([core_initial[0], core_initial[1], surface_initial[2], surface_initial[3]])
+        #ind_variables = ind_variables - (np.dot(inv_jac, differences))*0.01
+        #surface_initial = surface_initial - (np.dot(inv_jac, differences))*0.01
+        #core_initial = core_initial - (np.dot(inv_jac, differences))*0.0001
+        #print surface_initial
+        #print np.dot(inv_jac, differences)
+        #sys.exit()
+        #plot_models(core_masses, surface_masses, core_values, surface_values)
+        #plot_models(core_masses, surface_masses, core_values, surface_values)
+        # Kind of sloppy but need to do this for the new values to work as input
+        #surface_initial =  list(np.array(surface_initial).reshape(-1,))
+        #core_initial =  list(np.array(core_initial).reshape(-1,))
         integrate(star, core_masses, surface_masses, mass_initial, surface_initial, core_initial)
     else:
         # Also want to write out the logs
