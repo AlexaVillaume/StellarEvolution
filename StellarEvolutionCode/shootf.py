@@ -4,16 +4,15 @@ import sys
 import math
 import numpy as np
 from scipy.integrate import odeint
-from scipy.optimize import newton_krylov
 import matplotlib.pyplot as plt
 from copy import copy
 import opacity_interpolation
 import calc_density
 import utilities
 
-def percent_difference(value1, value2):
-    average = (math.fabs(value1) + math.fabs(value2))/2.
-    return math.fabs(value1 - value2) / average
+#def percent_difference(value1, value2):
+#    average = (math.fabs(value1) + math.fabs(value2))/2.
+#    return math.fabs(value1 - value2) / average
 
 def percent_difference(core_values, surface_values):
     """
@@ -54,6 +53,8 @@ def plot_models(core_masses, surface_masses, core_values, surface_values):
     plt.plot(surface_masses, surface_values[:,1], lw=2, color='r', ls = '-')
     plt.plot(surface_masses, surface_values[:,2], lw=2, color='g', ls = '-')
     plt.plot(surface_masses, surface_values[:,3], lw=2, color='k', ls = '-')
+    plt.xlabel('log Mass')
+    plt.ylabel('log')
     plt.xscale('log')
     plt.yscale('log')
     plt.legend()
@@ -140,7 +141,6 @@ def inward_start(star, test=False):
         plt.xscale('log')
         plt.yscale('log')
         plt.show()
-
     return [surface_pressure, star.teff, star.total_radius, star.total_lum]
 
 def derivatives(layer, enclosed_mass, star, test=False):
@@ -192,8 +192,6 @@ def compute_jacobian(star, differences, surface_guesses, core_guesses, core_mass
 
         new_surface = inward_start(guess_star)
         new_core = outward_start(guess_star, mass_step)
-        surface_values =  odeint(derivatives, new_surface, surface_masses, args=(guess_star,))
-        core_values = odeint(derivatives, new_core, core_masses, args=(guess_star,))
 
         new_differences = difference_is(odeint(derivatives, new_core, core_masses, args=(guess_star,)),
                             odeint(derivatives, new_surface, surface_masses, args=(guess_star,)))
@@ -203,26 +201,21 @@ def compute_jacobian(star, differences, surface_guesses, core_guesses, core_mass
 
 
 def integrate(star, core_masses, surface_masses, mass_initial, surface_initial, core_initial):
-    print surface_initial
-    print core_initial, '\n'
     core_values = odeint(derivatives, core_initial, core_masses, args=(star,))
     surface_values = odeint(derivatives, surface_initial, surface_masses, args=(star,))
 
-    #plot_models(core_masses, surface_masses, core_values, surface_values)
     differences = difference_is(core_values, surface_values)
-    print "Percent Difference: ", percent_difference(core_values, surface_values)
-    #if math.fabs(percent_difference(core_values, surface_values)) > 0.005:
-    if math.fabs(percent_difference(core_values, surface_values)) > 0.01:
+    percent_differences = percent_difference(core_values, surface_values)
+    print "Percent Difference: ", math.fabs(percent_differences)
+    if percent_differences > 0.005:
         inv_jac =  compute_jacobian(star, differences, surface_initial, core_initial, core_masses, surface_masses, mass_initial)
 
-        # Don't apply the correction directly to the old load1 and load2 initial conditions.
-        # apply to the array of independent variables, re-run load1 and load2 and then call odeint.
 
-
-        star.core_pressure = star.core_pressure - (np.dot(inv_jac, differences))[0]*0.01
-        star.core_temp = star.core_temp - (np.dot(inv_jac, differences))[1]*0.01
-        star.total_radius = star.total_radius - (np.dot(inv_jac, differences))[2]*0.01
-        star.total_lum = star.total_lum - (np.dot(inv_jac, differences))[3]*0.01
+        correction = np.dot(inv_jac, differences)
+        star.core_pressure = star.core_pressure - correction[0]*0.01
+        star.core_temp = star.core_temp - correction[1]*0.01
+        star.total_radius = star.total_radius - correction[2]*0.01
+        star.total_lum = star.total_lum - correction[3]*0.01
 
         surface_initial = inward_start(star)
         core_initial = outward_start(star, mass_initial)
@@ -242,7 +235,7 @@ def integrate(star, core_masses, surface_masses, mass_initial, surface_initial, 
     else:
         # Also want to write out the logs
         plot_models(core_masses, surface_masses, core_values, surface_values)
-        print "yay!"
+        print star.core_pressure, star.core_temp, star.total_radius, star.total_lum
 
 """
 Making testing suite.

@@ -15,20 +15,6 @@ gas_constant               = 8.32e7        # K^-1 mol^-1
 
 
 """
-Compute the Jacobian at the fitting point. Vary each initial guess while holding
-others constant, and compute partial derivatives in each case using foward
-difference approximation.
-"""
-#def get_jacobian(initial_guess):
-#    jacobian = np.ndarray(shape=(4,4), dtype=float)
-#    for i, value in enumerate(initial_guess):
-#        h = 0.01*value # Change value by 1%
-#        tmp = value + h
-#        new_guess = guess
-#        new_guess[i] = tmp
-#        new = shootf.deriative(
-
-"""
 Functions:
 """
 def nond_temperature(temperature, power):
